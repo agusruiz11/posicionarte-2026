@@ -3,6 +3,7 @@ import Hero from '@/components/Hero';
 import About from '@/components/About';
 import ServiceConfigurator from '@/components/ServiceConfigurator';
 import Services from '@/components/Services';
+import IASection from '@/components/IASection';
 import Methodology from '@/components/Methodology';
 import CaseStudies from '@/components/CaseStudies';
 import Testimonials from '@/components/Testimonials';
@@ -15,11 +16,12 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
-      <main>
+      <main id="main-content">
         <Hero />
         <About />
         <ServiceConfigurator />
         <Services />
+        <IASection />
         <Methodology />
         <CaseStudies />
         <Testimonials />

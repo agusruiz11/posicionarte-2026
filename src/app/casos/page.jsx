@@ -18,7 +18,7 @@ export default function CasosPage() {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
-      <main>
+      <main id="main-content">
         <section aria-labelledby="casos-heading" className="section-padding bg-white pt-28">
           <div className="max-w-7xl mx-auto text-center">
             <h1 id="casos-heading" className="text-4xl md:text-6xl font-bold text-[#414141] mb-6 tracking-tight">

@@ -17,12 +17,12 @@ const AnimatedSection = ({ children }) => (
 );
 
 const CARD_CLASS =
-  'bg-[rgb(249,249,249)] p-6 md:p-8 rounded-[2rem] border-[#eee] shadow-sm shrink-0 w-full';
+  'bg-[rgb(249,249,249)] dark:bg-[#1a1a1a] p-6 md:p-8 rounded-[2rem] border border-[#eee] dark:border-gray-800 shadow-sm shrink-0 w-full';
 
 const TestimonialCard = ({ testimonial }) => (
   <div className={CARD_CLASS}>
     <div className="flex gap-4 mb-4">
-      <div className="w-14 h-14 shrink-0 rounded-full overflow-hidden bg-[#D9D9D9]">
+      <div className="w-14 h-14 shrink-0 rounded-full overflow-hidden bg-[#D9D9D9] dark:bg-gray-700">
         <img
           alt={testimonial.image}
           className="w-full h-full object-cover"
@@ -30,7 +30,7 @@ const TestimonialCard = ({ testimonial }) => (
         />
       </div>
       <div>
-        <div className="font-semibold text-[#333] text-base md:text-lg">{testimonial.name}</div>
+        <div className="font-semibold text-[#333] dark:text-white text-base md:text-lg">{testimonial.name}</div>
         <div className="text-sm text-[#666]">{testimonial.role}</div>
       </div>
     </div>
@@ -95,15 +95,19 @@ const Testimonials = () => {
   };
 
   return (
-    <section className="section-padding bg-white">
+    <section className="section-padding bg-white dark:bg-[#0c0c0c]">
       <div className="container mx-auto overflow-hidden">
         <AnimatedSection>
-          <h2 className="text-center text-3xl md:text-7xl font-bold text-[#414141] mb-12 md:mb-16 tracking-tight">
+          <h2 className="text-center text-3xl md:text-7xl font-bold text-[#414141] dark:text-white mb-12 md:mb-16 tracking-tight">
             Lo que dicen nuestros <span className="text-[#3256D7]">clientes</span>.
           </h2>
         </AnimatedSection>
 
-        <div className="relative overflow-hidden mb-10 md:mb-12">
+        <div
+          className="relative overflow-hidden mb-10 md:mb-12"
+          aria-live="polite"
+          aria-atomic="true"
+        >
           <motion.div
             className="flex"
             animate={{ x: `-${currentSlide * (100 / totalSlides)}%` }}

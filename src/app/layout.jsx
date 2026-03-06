@@ -1,5 +1,13 @@
 import '@/app/globals.css';
+import { Plus_Jakarta_Sans } from 'next/font/google';
 import { Toaster } from '@/components/ui/toaster';
+import { ThemeProvider } from '@/components/ThemeProvider';
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+});
 
 const SITE_URL = 'https://posicionarte.online';
 
@@ -42,10 +50,10 @@ export const metadata = {
       'Impulsamos tu crecimiento digital con estrategia y creatividad. Especialistas en Google Ads, Meta Ads, SEO, Diseño Web y más.',
     images: [
       {
-        url: '/favicon.png',
-        width: 512,
-        height: 512,
-        alt: 'Posicionarte Online',
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Posicionarte Online - Agencia de Marketing Digital',
       },
     ],
   },
@@ -54,23 +62,31 @@ export const metadata = {
     title: 'Posicionarte Online - Agencia de Marketing Digital',
     description:
       'Impulsamos tu crecimiento digital con estrategia y creatividad. Especialistas en Google Ads, Meta Ads, SEO, Diseño Web y más.',
-    images: ['/favicon.png'],
+    images: ['/og-image.jpg'],
   },
   robots: { index: true, follow: true },
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="es">
+    <html lang="es" className={jakarta.variable}>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-screen bg-white">
-        {children}
-        <Toaster />
+      <body className="min-h-screen bg-white dark:bg-[#0c0c0c] dark:text-white transition-colors duration-300">
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-[#3256D7] focus:text-white focus:rounded-full focus:text-sm focus:font-semibold"
+          >
+            Saltar al contenido principal
+          </a>
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

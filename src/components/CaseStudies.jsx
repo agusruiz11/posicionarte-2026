@@ -2,73 +2,83 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { EASE, staggerContainer, slideUp } from '@/lib/motion';
 
-const AnimatedSection = ({ children }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 50 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, amount: 0.2 }}
-    transition={{ duration: 0.8, ease: 'easeOut' }}
-  >
-    {children}
-  </motion.div>
-);
+const cases = [
+  {
+    client: 'Dyxoma',
+    industry: 'E-commerce',
+    bgColor: 'bg-blue-50',
+    // Reemplazar con imagen real del cliente
+    src: null,
+    alt: 'Caso de estudio Dyxoma — E-commerce',
+  },
+  {
+    client: 'Fútbol Queens',
+    industry: 'Deportes',
+    bgColor: 'bg-green-50',
+    src: null,
+    alt: 'Caso de estudio Fútbol Queens — Deportes',
+  },
+  {
+    client: 'Multi Import',
+    industry: 'B2B',
+    bgColor: 'bg-yellow-50',
+    src: null,
+    alt: 'Caso de estudio Multi Import — B2B',
+  },
+];
 
 const CaseStudies = () => {
-  const cases = [
-    {
-      client: 'Dyxoma',
-      industry: 'E-commerce',
-      image: 'A modern e-commerce website dashboard on a laptop screen',
-      bgColor: 'bg-blue-50'
-    },
-    {
-      client: 'Fútbol Queens',
-      industry: 'Deportes',
-      image: 'Social media engagement chart for a sports brand',
-      bgColor: 'bg-green-50'
-    },
-    {
-      client: 'Multi Import',
-      industry: 'B2B',
-      image: 'SEO analytics showing first page ranking for a B2B company',
-      bgColor: 'bg-yellow-50'
-    }
-  ];
-
   return (
-    <section id="casos" className="section-padding bg-white">
+    <section id="casos" className="section-padding bg-white dark:bg-[#0c0c0c]">
       <div className="max-w-7xl mx-auto">
-        <AnimatedSection>
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-6xl font-bold text-[#414141] mb-6 tracking-tight">
-              Resultados que <span className="text-[#3256D7]">hablan</span>.
-            </h2>
-            <p className="text-lg md:text-xl text-gray-500 max-w-3xl mx-auto">
-              Clientes que confiaron en nuestra metodología y estrategia para crecer.
-            </p>
-          </div>
-        </AnimatedSection>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.7, ease: EASE }}
+          className="text-center mb-20"
+        >
+          <h2 className="text-4xl md:text-6xl font-bold text-[#414141] dark:text-white mb-6 tracking-tight">
+            Resultados que <span className="text-[#3256D7]">hablan</span>.
+          </h2>
+          <p className="text-lg md:text-xl text-gray-500 max-w-3xl mx-auto">
+            Clientes que confiaron en nuestra metodología y estrategia para crecer.
+          </p>
+        </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {cases.map((caseStudy, index) => (
+        <motion.div
+          variants={staggerContainer(0.1, 0.1)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          className="grid md:grid-cols-3 gap-8"
+        >
+          {cases.map((caseStudy) => (
             <motion.div
               key={caseStudy.client}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.5 }}
-              transition={{ duration: 0.6, delay: index * 0.1, ease: 'easeOut' }}
+              variants={slideUp(0)}
               className="group"
             >
-              <div className={`relative aspect-square rounded-3xl overflow-hidden mb-6 ${caseStudy.bgColor}`}>
-                <img alt={caseStudy.image} className="w-full h-full object-contain p-8 group-hover:scale-105 transition-transform duration-500 ease-in-out" src="https://images.unsplash.com/photo-1545029013-53df3fe020e8" />
+              <div className={`relative aspect-square rounded-3xl overflow-hidden mb-6 ${caseStudy.bgColor} flex items-center justify-center`}>
+                {caseStudy.src ? (
+                  <img
+                    src={caseStudy.src}
+                    alt={caseStudy.alt}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out"
+                  />
+                ) : (
+                  <span className="text-5xl font-bold text-[#414141]/10 select-none">
+                    {caseStudy.client[0]}
+                  </span>
+                )}
               </div>
-              <h3 className="text-2xl font-bold text-[#414141]">{caseStudy.client}</h3>
+              <h3 className="text-2xl font-bold text-[#414141] dark:text-white">{caseStudy.client}</h3>
               <p className="text-lg text-gray-500">{caseStudy.industry}</p>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

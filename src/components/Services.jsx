@@ -53,7 +53,7 @@ const Services = () => {
   return (
     <motion.section
       id="servicios"
-      className="section-padding bg-gray-50"
+      className="section-padding bg-gray-50 dark:bg-[#111111]"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.1 }}
@@ -67,7 +67,7 @@ const Services = () => {
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-[#414141] tracking-tight">
+            <h2 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-[#414141] dark:text-white tracking-tight">
               Soluciones para cada <span className="text-[#3256D7]">objetivo</span>.
             </h2>
             <p className="text-lg md:text-xl text-gray-500 max-w-3xl mx-auto font-light leading-relaxed">
@@ -88,10 +88,10 @@ const Services = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="border-b border-gray-200 last:border-b-0"
+                className="border-b border-gray-200 dark:border-gray-800 last:border-b-0"
               >
                 <div
-                  className="flex justify-between items-center cursor-pointer py-8 group gap-4"
+                  className="flex justify-between items-center cursor-pointer py-8 group gap-4 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3256D7] focus-visible:ring-offset-2"
                   onClick={() => handleServiceClick(index)}
                   role="button"
                   tabIndex={0}
@@ -111,7 +111,7 @@ const Services = () => {
                     </div>
                     <h3
                       className={`text-2xl md:text-4xl font-semibold transition-colors duration-300 ${
-                        isActive ? 'text-[#3256D7]' : 'text-[#414141] group-hover:text-[#3256D7]'
+                        isActive ? 'text-[#3256D7]' : 'text-[#414141] dark:text-white group-hover:text-[#3256D7]'
                       }`}
                     >
                       {service.title}

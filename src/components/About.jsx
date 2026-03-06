@@ -2,100 +2,88 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Target, Eye, Heart, Award } from 'lucide-react';
-import { Button } from './ui/button';
-import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { useReducedMotion } from '@/lib/use-reduced-motion';
+import { EASE, staggerContainer, slideUp } from '@/lib/motion';
 
-const AnimatedSection = ({ children }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 50 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, amount: 0.3 }}
-    transition={{ duration: 0.8, ease: 'easeOut' }}
-  >
-    {children}
-  </motion.div>
-);
+const differentiators = [
+  {
+    number: '01',
+    title: 'Sin paquetes rígidos',
+    description: 'Combinamos solo lo que tu negocio necesita. Nada más, nada menos.',
+  },
+  {
+    number: '02',
+    title: 'Cualquier punto de partida',
+    description: 'Empezás desde cero o querés escalar lo que ya funciona. Nos adaptamos.',
+  },
+  {
+    number: '03',
+    title: 'Estrategia, tecnología y ejecución',
+    description: 'Todo en un solo equipo. Sin tercerizar ni perder tiempo coordinando proveedores.',
+  },
+  {
+    number: '04',
+    title: 'IA y automatización real',
+    description: 'No como tendencia. Como herramienta concreta que libera tiempo y multiplica resultados.',
+  },
+];
 
 const About = () => {
-  const values = [
-    {
-      icon: Target,
-      title: 'Misión',
-      description: 'Impulsar el crecimiento de negocios mediante estrategias digitales efectivas, medibles y sostenibles.'
-    },
-    {
-      icon: Eye,
-      title: 'Visión',
-      description: 'Ser la agencia de referencia para pymes que buscan resultados reales y acompañamiento estratégico.'
-    },
-    {
-      icon: Heart,
-      title: 'Valores',
-      description: 'Transparencia, compromiso, creatividad estratégica y comunicación clara sin tecnicismos.'
-    },
-    {
-      icon: Award,
-      title: 'Diferencial',
-      description: 'Trabajo artesanal, análisis profundo, procesos ordenados y acompañamiento continuo en cada proyecto.'
-    }
-  ];
+  const reduced = useReducedMotion();
+
+  const containerVariants = reduced
+    ? { hidden: {}, visible: {} }
+    : staggerContainer(0.1, 0.2);
+
+  const itemVariants = reduced
+    ? { hidden: { opacity: 1, y: 0 }, visible: { opacity: 1, y: 0 } }
+    : slideUp(0);
 
   return (
-    <section id="about" className="section-padding bg-[#F5F5F5] drop-shadow-lg rounded-[8em]">
-      <div className="max-w-5xl mx-auto">
-        <AnimatedSection>
-          <div className="text-center mb-10">
-            <h2 className="text-4xl md:text-6xl font-bold text-[#414141] mb-6 tracking-tight">
-              Somos tu socio <span className="text-[#3256D7]">estratégico</span> digital.
-            </h2>
-            <p className="text-lg md:text-xl text-gray-500 max-w-3xl mx-auto">
-              Nos enfocamos en ayudar a emprendedores, pymes y negocios locales a alcanzar sus objetivos comerciales a través de estrategias digitales efectivas y medibles.
-            </p>
-          </div>
+    <section id="about" className="section-padding bg-white dark:bg-[#0c0c0c]">
+      <div className="container mx-auto max-w-5xl">
+        <motion.p
+          initial={reduced ? false : { opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ duration: 0.5, ease: EASE }}
+          className="text-sm font-semibold uppercase tracking-widest text-[#3256D7] mb-6 text-center"
+        >
+          Por qué elegirnos
+        </motion.p>
 
-        <div className="flex justify-center">
-          <motion.div className="group">
-            <Button
-              asChild
-              variant="outline"
-              className="relative overflow-hidden !bg-white !text-[#3256D7] rounded-full px-8 py-6 text-lg font-semibold transition-shadow duration-300 [box-shadow:inset_0_0_0_1px_#3256D7] hover:[box-shadow:inset_0_0_0_1px_#3256D7,0_4px_12px_-2px_rgba(50,86,215,0.25)]"
-            >
-              <Link href="/contacto" className="relative inline-flex items-center justify-center min-w-[200px]">
-                <span
-                  className="absolute inset-0 rounded-full bg-[#3256D7] scale-y-0 origin-bottom transition-[transform] duration-500 ease-out group-hover:scale-y-100 pointer-events-none"
-                  aria-hidden
-                  />
-                <span className="relative z-10 transition-colors duration-500 group-hover:text-white">
-                  ¿Qué hacemos?
-                </span>
-              </Link>
-            </Button>
-          </motion.div>
-        </div>
-        </AnimatedSection>
+        <motion.h2
+          initial={reduced ? false : { opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ duration: 0.6, ease: EASE, delay: 0.1 }}
+          className="text-4xl md:text-5xl font-bold text-[#414141] dark:text-white tracking-tight text-center mb-16 leading-tight"
+        >
+          No somos un proveedor de servicios.
+          <span className="block text-[#3256D7]">Somos el equipo que construye tu sistema.</span>
+        </motion.h2>
 
-        {/* <div className="grid md:grid-cols-2 gap-10">
-          {values.map((value, index) => (
-            <motion.div
-              key={value.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.5 }}
-              transition={{ duration: 0.6, delay: index * 0.1, ease: 'easeOut' }}
-              className="flex gap-6"
-            >
-              <div className="flex-shrink-0 w-12 h-12 bg-[#3256D7] bg-opacity-10 rounded-lg flex items-center justify-center">
-                <value.icon className="text-[#3256D7]" size={24} />
-              </div>
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          className="grid md:grid-cols-2 gap-x-16 gap-y-12"
+        >
+          {differentiators.map((item) => (
+            <motion.div key={item.number} variants={itemVariants} className="flex gap-6">
+              <span className="text-3xl font-bold text-[#3256D7]/20 leading-none shrink-0 w-10 pt-1">
+                {item.number}
+              </span>
               <div>
-                <h3 className="text-2xl font-bold text-[#414141] mb-2">{value.title}</h3>
-                <p className="text-gray-500 text-lg leading-relaxed">{value.description}</p>
+                <h3 className="text-xl font-semibold text-[#414141] dark:text-white mb-2 leading-snug">
+                  {item.title}
+                </h3>
+                <p className="text-gray-500 leading-relaxed">{item.description}</p>
               </div>
             </motion.div>
           ))}
-        </div> */}
+        </motion.div>
       </div>
     </section>
   );

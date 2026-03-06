@@ -19,7 +19,7 @@ export default function ServiciosPage() {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
-      <main>
+      <main id="main-content">
         <section aria-labelledby="servicios-heading" className="section-padding bg-white pt-28">
           <div className="max-w-5xl mx-auto text-center">
             <h1 id="servicios-heading" className="text-4xl md:text-6xl font-bold text-[#414141] mb-6 tracking-tight">

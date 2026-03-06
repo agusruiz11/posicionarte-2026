@@ -44,7 +44,7 @@ const Methodology = () => {
     <section
       id="metodologia"
       ref={sectionRef}
-      className="section-padding bg-gray-50"
+      className="section-padding bg-gray-50 dark:bg-[#111111]"
     >
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
@@ -53,7 +53,7 @@ const Methodology = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-16 md:mb-24"
         >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#414141] mb-4">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#414141] dark:text-white mb-4">
             Un proceso <span className="text-[#3256D7]">claro</span> y{' '}
             <span className="text-[#3256D7]">efectivo</span>
           </h2>
@@ -64,7 +64,7 @@ const Methodology = () => {
 
         <div className="relative">
           {/* Línea del timeline - solo desktop */}
-          <div className="hidden md:block absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#3256D7]/30 via-[#3256D7]/50 to-[#3256D7]/30" />
+          <div className="hidden md:block absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#3256D7]/30 via-[#3256D7]/50 to-[#3256D7]/30 dark:from-[#3256D7]/20 dark:via-[#3256D7]/40 dark:to-[#3256D7]/20" />
 
           {/* Pasos */}
           <div className="space-y-12 md:space-y-20 relative">
@@ -95,7 +95,7 @@ const Methodology = () => {
                     <span className="hidden md:block text-7xl lg:text-8xl font-bold text-[#3256D7]/20 leading-none">
                       {step.number}
                     </span>
-                    <h3 className="text-2xl md:text-3xl font-bold text-[#414141]">
+                    <h3 className="text-2xl md:text-3xl font-bold text-[#414141] dark:text-white">
                       {step.title}
                     </h3>
                   </div>

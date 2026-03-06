@@ -21,7 +21,7 @@ export default function ContactSection() {
   };
 
   return (
-    <section id="contacto" className="section-padding bg-white pt-28" aria-labelledby="contacto-heading">
+    <section id="contacto" className="px-6 md:px-10 pt-28 pb-12 bg-white dark:bg-[#0c0c0c]" aria-labelledby="contacto-heading">
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-2 gap-16">
           <motion.div
@@ -30,10 +30,10 @@ export default function ContactSection() {
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
           >
-            <h1 id="contacto-heading" className="text-4xl md:text-5xl font-bold text-[#414141] mb-6 tracking-tight">
+            <h1 id="contacto-heading" className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#414141] dark:text-white mb-8 leading-tight tracking-tight">
               Hablemos.
             </h1>
-            <p className="text-lg text-gray-500 max-w-md">
+            <p className="text-lg md:text-xl text-[#414141]/70 mb-12 max-w-xl text-left font-light leading-relaxed">
               Estamos listos para escuchar sobre tu proyecto y encontrar la mejor manera de ayudarte a crecer. Completá el formulario o escribinos por WhatsApp.
             </p>
           </motion.div>

@@ -6,17 +6,6 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Check, Calendar, Briefcase, Users } from 'lucide-react';
 
-const AnimatedSection = ({ children }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 50 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, amount: 0.3 }}
-    transition={{ duration: 0.8, ease: 'easeOut' }}
-  >
-    {children}
-  </motion.div>
-);
-
 const Plans = () => {
   const plans = [
     {
@@ -55,18 +44,22 @@ const Plans = () => {
   ];
 
   return (
-    <section className="section-padding bg-white">
+    <section className="section-padding bg-white dark:bg-[#0c0c0c]">
       <div className="max-w-6xl mx-auto">
-        <AnimatedSection>
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-6xl font-bold text-[#414141] mb-6 tracking-tight">
-              Modalidades de <span className="text-[#3256D7]">Trabajo</span>.
-            </h2>
-            <p className="text-lg md:text-xl text-gray-500 max-w-3xl mx-auto">
-              Elegí la opción que mejor se adapte a las necesidades y objetivos de tu negocio.
-            </p>
-          </div>
-        </AnimatedSection>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="text-center mb-20"
+        >
+          <h2 className="text-4xl md:text-6xl font-bold text-[#414141] dark:text-white mb-6 tracking-tight">
+            Modalidades de <span className="text-[#3256D7]">Trabajo</span>.
+          </h2>
+          <p className="text-lg md:text-xl text-gray-500 max-w-3xl mx-auto">
+            Elegí la opción que mejor se adapte a las necesidades y objetivos de tu negocio.
+          </p>
+        </motion.div>
 
         <div className="grid md:grid-cols-3 gap-8">
           {plans.map((plan, index) => (
@@ -77,7 +70,7 @@ const Plans = () => {
               viewport={{ once: true, amount: 0.5 }}
               transition={{ duration: 0.6, delay: index * 0.1, ease: 'easeOut' }}
               className={`border rounded-3xl p-8 flex flex-col ${
-                plan.highlight ? 'bg-[#414141] text-white border-gray-700' : 'bg-gray-50 border-gray-200'
+                plan.highlight ? 'bg-[#414141] dark:bg-[#1a1a1a] text-white border-gray-700' : 'bg-gray-50 dark:bg-[#141414] border-gray-200 dark:border-gray-800'
               }`}
             >
               {plan.highlight && (
@@ -86,7 +79,7 @@ const Plans = () => {
                 </div>
               )}
               <div className="flex-grow">
-                <h3 className="text-3xl font-bold mb-3">{plan.title}</h3>
+                <h3 className="text-3xl font-bold mb-3 dark:text-white">{plan.title}</h3>
                 <p className={`mb-8 ${plan.highlight ? 'text-gray-300' : 'text-gray-500'}`}>{plan.description}</p>
                 <ul className="space-y-3 mb-10">
                   {plan.features.map((feature) => (
@@ -97,14 +90,16 @@ const Plans = () => {
                   ))}
                 </ul>
               </div>
-              <Button 
+              <Button asChild
                 className={`w-full rounded-full py-6 text-base font-semibold ${
-                  plan.highlight 
-                    ? 'bg-white text-[#414141] hover:bg-gray-200' 
+                  plan.highlight
+                    ? 'bg-white text-[#414141] hover:bg-gray-200'
                     : 'bg-[#3256D7] text-white hover:bg-[#2845b8]'
                 }`}
               >
-                Consultar
+                <a href="https://wa.me/5491172360193" target="_blank" rel="noopener noreferrer">
+                  Consultar
+                </a>
               </Button>
             </motion.div>
           ))}

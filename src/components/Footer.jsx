@@ -12,7 +12,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { motion } from 'framer-motion';
 import logoOnline from '@/assets/logo/logo-online.png';
 
-const Footer = () => {
+const Footer = ({ hideForm = false }) => {
   const year = new Date().getFullYear();
   const { toast } = useToast();
 
@@ -29,16 +29,16 @@ const Footer = () => {
   };
 
   return (
-    <footer id="footer" className="section-padding bg-white">
+    <footer id="footer" className="section-padding bg-white dark:bg-[#0c0c0c]">
       <div className="container mx-auto">
-        <div className="grid md:grid-cols-2 gap-16 mb-12">
+        {!hideForm && <div className="grid md:grid-cols-2 gap-16 mb-12">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
           >
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#414141] mb-8 leading-tight tracking-tight">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#414141] dark:text-white mb-8 leading-tight tracking-tight">
               Hablemos.
             </h2>
             <p className="text-lg md:text-xl text-[#414141]/70 mb-12 max-w-xl text-left font-light leading-relaxed">
@@ -71,9 +71,9 @@ const Footer = () => {
               Enviar mensaje
             </Button>
           </motion.form>
-        </div>
+        </div>}
 
-        <div className="border-t border-gray-200 pt-8 mt-12">
+        <div className="border-t border-gray-200 dark:border-gray-800 pt-8 mt-12">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <motion.button
               onClick={scrollToTop}
@@ -89,7 +89,7 @@ const Footer = () => {
                 className="h-16 md:h-24 lg:h-32 w-[200px] md:w-[300px] lg:w-[300px] object-contain object-left"
               />
             </motion.button>
-            <p className="pt-8 text-center text-[#414141]/60">
+            <p className="pt-8 text-center text-[#414141]/60 dark:text-gray-500">
               © {year} Posicionarte Online. Todos los derechos reservados.
             </p>
             <div className="flex gap-4 order-2 md:order-3">
@@ -98,7 +98,7 @@ const Footer = () => {
               href="https://www.linkedin.com/company/posicionarte-online"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-foreground hover:text-[#3256D7] transition-colors"
+              className="text-[#414141] dark:text-gray-400 hover:text-[#3256D7] dark:hover:text-[#3256D7] transition-colors"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               aria-label="LinkedIn"
@@ -119,7 +119,7 @@ const Footer = () => {
               href="https://www.instagram.com/posicionarteonline"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-foreground hover:text-[#3256D7] transition-colors"
+              className="text-[#414141] dark:text-gray-400 hover:text-[#3256D7] dark:hover:text-[#3256D7] transition-colors"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               aria-label="Instagram"
@@ -140,7 +140,7 @@ const Footer = () => {
               href="https://www.facebook.com/posicionarteonline"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-foreground hover:text-[#3256D7] transition-colors"
+              className="text-[#414141] dark:text-gray-400 hover:text-[#3256D7] dark:hover:text-[#3256D7] transition-colors"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               aria-label="Facebook"

@@ -17,10 +17,10 @@ export default function ContactoPage() {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
-      <main>
+      <main id="main-content">
         <ContactSection />
       </main>
-      <Footer />
+      <Footer hideForm />
       <WhatsAppButton />
     </div>
   );
