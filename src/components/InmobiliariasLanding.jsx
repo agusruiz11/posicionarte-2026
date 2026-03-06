@@ -215,8 +215,7 @@ const InmobiliariasLanding = () => {
             transition={{ duration: 0.5, ease: EASE, delay: 0.2 }}
             className="text-lg text-gray-500 dark:text-gray-400 max-w-xl mx-auto mb-12 leading-relaxed font-light text-center"
           >
-            Precios por zona, tiempo de venta promedio, canales de captación más
-            efectivos y estrategias digitales que están funcionando ahora.
+            Estrategias digitales que están funcionando ahora.
           </motion.p>
 
           {/* Video + CTA — mobile: columna / desktop: lado a lado */}
@@ -229,7 +228,7 @@ const InmobiliariasLanding = () => {
               transition={{ duration: 0.7, ease: EASE, delay: 0.3 }}
               className="w-full md:w-auto flex-shrink-0"
             >
-              <div className="relative mx-auto w-full max-w-[300px] sm:max-w-[340px] md:max-w-[260px] lg:max-w-[300px] aspect-[9/16] rounded-3xl overflow-hidden shadow-2xl shadow-black/15 dark:shadow-black/50 ring-1 ring-black/5 dark:ring-white/5">
+              <div className="relative mx-auto w-full max-w-[300px] sm:max-w-[340px] md:w-[260px] lg:w-[300px] aspect-[9/16] rounded-3xl overflow-hidden shadow-2xl shadow-black/15 dark:shadow-black/50 ring-1 ring-black/5 dark:ring-white/5">
                 {/* TODO: reemplazar src del video */}
                 <video
                   autoPlay
