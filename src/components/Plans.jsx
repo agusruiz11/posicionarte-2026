@@ -21,7 +21,7 @@ const Plans = () => {
     },
     {
       icon: Briefcase,
-      title: 'Proyecto Único',
+      title: 'FULL POSI',
       description: 'Soluciones específicas para necesidades puntuales.',
       features: [
         'Diseño y desarrollo web',
@@ -44,7 +44,7 @@ const Plans = () => {
   ];
 
   return (
-    <section className="section-padding bg-white dark:bg-[#0c0c0c]">
+    <section className="section-padding bg-white dark:bg-[#111111]">
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -70,7 +70,7 @@ const Plans = () => {
               viewport={{ once: true, amount: 0.5 }}
               transition={{ duration: 0.6, delay: index * 0.1, ease: 'easeOut' }}
               className={`border rounded-3xl p-8 flex flex-col ${
-                plan.highlight ? 'bg-[#414141] dark:bg-[#1a1a1a] text-white border-gray-700' : 'bg-gray-50 dark:bg-[#141414] border-gray-200 dark:border-gray-800'
+                plan.highlight ? 'bg-[#414141] dark:bg-[#000212] text-white border-gray-700' : 'bg-gray-50 dark:bg-[#141414] border-gray-200 dark:border-gray-800'
               }`}
             >
               {plan.highlight && (

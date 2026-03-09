@@ -35,7 +35,7 @@ const IASection = () => {
     : slideUp(0);
 
   return (
-    <section id="ia" className="section-padding bg-[#111111]">
+    <section id="ia" className="section-padding bg-[#000212]">
       <div className="container mx-auto max-w-5xl">
         <motion.p
           initial={reduced ? false : { opacity: 0, y: 10 }}

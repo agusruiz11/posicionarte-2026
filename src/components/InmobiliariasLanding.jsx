@@ -1,16 +1,16 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { useReducedMotion } from '@/lib/use-reduced-motion';
-import { EASE, fadeIn, slideUp } from '@/lib/motion';
-import { X, Download, CheckCircle } from 'lucide-react';
+import { EASE } from '@/lib/motion';
+import { X, Download, CheckCircle, Play, Pause, Volume2, VolumeX } from 'lucide-react';
 
-// ─── Skyline SVG ─────────────────────────────────────────────────────────────
+// ─── Skyline SVG ──────────────────────────────────────────────────────────────
 
 const BUILDINGS = [
   { x: 2,   w: 38,  h: 70  },
@@ -52,29 +52,129 @@ const SkylineSVG = ({ isInView, reduced }) => (
   </svg>
 );
 
+// ─── Video player ─────────────────────────────────────────────────────────────
+
+const VideoPlayer = () => {
+  const videoRef = useRef(null);
+  const [muted, setMuted] = useState(true);
+  const [playing, setPlaying] = useState(true);
+
+  const toggleMute = () => {
+    if (!videoRef.current) return;
+    videoRef.current.muted = !muted;
+    setMuted((m) => !m);
+  };
+
+  const togglePlay = () => {
+    if (!videoRef.current) return;
+    if (playing) {
+      videoRef.current.pause();
+    } else {
+      videoRef.current.play();
+    }
+    setPlaying((p) => !p);
+  };
+
+  return (
+    <div className="relative mx-auto w-full max-w-[340px] md:w-[320px] lg:w-[360px] aspect-square rounded-3xl overflow-hidden shadow-2xl shadow-black/15 dark:shadow-black/50 ring-1 ring-black/5 dark:ring-white/5">
+      <video
+        ref={videoRef}
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
+        aria-label="Video de presentación del Benchmark Inmobiliario"
+      >
+        <source src="/videos/video-landing-inmobiliaria.mp4" type="video/mp4" />
+      </video>
+
+      {/* Gradiente inferior */}
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/70 to-transparent pointer-events-none" />
+
+      {/* Controles */}
+      <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-3">
+        <button
+          onClick={togglePlay}
+          aria-label={playing ? 'Pausar video' : 'Reproducir video'}
+          className="flex items-center justify-center w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-colors"
+        >
+          {playing ? <Pause size={14} /> : <Play size={14} />}
+        </button>
+        <button
+          onClick={toggleMute}
+          aria-label={muted ? 'Activar sonido' : 'Silenciar'}
+          className="flex items-center justify-center w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-colors"
+        >
+          {muted ? <VolumeX size={14} /> : <Volume2 size={14} />}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// ─── Opciones de inversión ────────────────────────────────────────────────────
+
+const INVERSION_OPTIONS = [
+  { value: 'si_menos_500',     label: 'Sí, menos de 500 USD' },
+  { value: 'si_500_1000',      label: 'Sí, entre 500 y 1.000 USD' },
+  { value: 'si_mas_1000',      label: 'Sí, más de 1.000 USD' },
+  { value: 'no',               label: 'No, nada' },
+  { value: 'no_contesta',      label: 'Prefiero no contestar' },
+];
+
+const PDF_PATH     = '/benchmark-inmobiliario-2025.pdf';
+const PDF_FILENAME = 'Benchmark-Inmobiliario-Posicionarte-2025.pdf';
+
 // ─── Modal de descarga ────────────────────────────────────────────────────────
 
 const DownloadModal = ({ onClose, reduced }) => {
   const { toast } = useToast();
-  const [status, setStatus] = useState('idle');
-  const [form, setForm] = useState({ q1: '', q2: '', q3: '' });
+  const [status, setStatus] = useState('idle'); // idle | loading | done | error
+  const [form, setForm] = useState({
+    name: '',
+    company: '',
+    email: '',
+    phone: '',
+    inversion: '',
+  });
 
-  const handleSubmit = (e) => {
+  const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
+
+  const triggerDownload = () => {
+    const a = document.createElement('a');
+    a.href = PDF_PATH;
+    a.download = PDF_FILENAME;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus('downloading');
-    setTimeout(() => {
-      /* TODO: cargar URL del PDF */
-      const pdfUrl = '/benchmark-inmobiliario-2025.pdf';
-      const a = document.createElement('a');
-      a.href = pdfUrl;
-      a.download = 'Benchmark-Inmobiliario-Posicionarte-2025.pdf';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+    if (!form.inversion) {
+      toast({ title: 'Seleccioná una opción', description: 'Indicá si invertís actualmente en posicionamiento.', variant: 'destructive' });
+      return;
+    }
+    setStatus('loading');
+    try {
+      const res = await fetch('/api/benchmark', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error();
+      triggerDownload();
       setStatus('done');
       toast({ title: '¡Descarga iniciada!', description: 'El benchmark está en tu carpeta de descargas.' });
-    }, 1200);
+    } catch {
+      setStatus('error');
+      toast({ title: 'Algo salió mal', description: 'Intentá de nuevo o escribinos por WhatsApp.', variant: 'destructive' });
+    }
   };
+
+  const inputClass = 'dark:bg-[#111111] dark:border-gray-700 dark:text-white dark:placeholder:text-gray-600 mt-1 rounded-xl';
+  const labelClass = 'text-gray-500 dark:text-gray-400 text-sm';
 
   return (
     <motion.div
@@ -90,13 +190,11 @@ const DownloadModal = ({ onClose, reduced }) => {
         animate={{ opacity: 1, y: 0 }}
         exit={reduced ? { opacity: 0 } : { opacity: 0, y: 40 }}
         transition={{ duration: 0.4, ease: EASE }}
-        className="bg-white dark:bg-[#1a1a1a] rounded-3xl p-8 w-full max-w-md shadow-2xl"
+        className="bg-white dark:bg-[#1a1a1a] rounded-3xl p-8 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto"
       >
         <div className="flex justify-between items-start mb-6">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-[#3256D7] mb-1">
-              Descarga gratuita
-            </p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#3256D7] mb-1">Descarga gratuita</p>
             <h3 className="text-2xl font-bold text-[#414141] dark:text-white leading-tight">
               Completá el formulario<br />para descargar
             </h3>
@@ -116,44 +214,89 @@ const DownloadModal = ({ onClose, reduced }) => {
             <CheckCircle size={48} className="text-[#3256D7]" strokeWidth={1.5} />
             <p className="text-lg font-semibold text-[#414141] dark:text-white">¡Tu descarga comenzó!</p>
             <p className="text-gray-500 text-sm">Revisá tu carpeta de descargas.</p>
+            <button
+              onClick={triggerDownload}
+              className="text-[#3256D7] text-sm font-medium underline underline-offset-2 hover:no-underline transition-all"
+            >
+              Volver a descargar
+            </button>
             <Button onClick={onClose} variant="outline" className="rounded-full mt-2 dark:border-gray-700 dark:text-gray-200">
               Cerrar
             </Button>
           </motion.div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* TODO: reemplazar placeholders con las preguntas reales */}
-            {[
-              { id: 'modal-q1', key: 'q1', label: 'Pregunta 1' },
-              { id: 'modal-q2', key: 'q2', label: 'Pregunta 2' },
-              { id: 'modal-q3', key: 'q3', label: 'Pregunta 3' },
-            ].map(({ id, key, label }) => (
-              <div key={id}>
-                <Label htmlFor={id} className="text-gray-500 dark:text-gray-400 text-sm">{label}</Label>
-                <Input
-                  id={id}
-                  placeholder={label}
-                  required
-                  value={form[key]}
-                  onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
-                  className="dark:bg-[#111111] dark:border-gray-700 dark:text-white dark:placeholder:text-gray-600 mt-1"
-                />
+          <form onSubmit={handleSubmit} className="space-y-4">
+
+            {/* Nombre */}
+            <div>
+              <Label htmlFor="f-name" className={labelClass}>Nombre <span className="text-[#E03E2D]">*</span></Label>
+              <Input id="f-name" type="text" placeholder="Tu nombre completo" required value={form.name} onChange={set('name')} className={inputClass} />
+            </div>
+
+            {/* Inmobiliaria */}
+            <div>
+              <Label htmlFor="f-company" className={labelClass}>Inmobiliaria <span className="text-[#E03E2D]">*</span></Label>
+              <Input id="f-company" type="text" placeholder="Nombre de tu inmobiliaria" required value={form.company} onChange={set('company')} className={inputClass} />
+            </div>
+
+            {/* Email */}
+            <div>
+              <Label htmlFor="f-email" className={labelClass}>Mail <span className="text-[#E03E2D]">*</span></Label>
+              <Input id="f-email" type="email" placeholder="ejemplo@inmobiliaria.com" required value={form.email} onChange={set('email')} className={inputClass} />
+            </div>
+
+            {/* Teléfono */}
+            <div>
+              <Label htmlFor="f-phone" className={labelClass}>Teléfono</Label>
+              <Input id="f-phone" type="tel" placeholder="+54 11 0000-0000" value={form.phone} onChange={set('phone')} className={inputClass} />
+            </div>
+
+            {/* Inversión */}
+            <div>
+              <p className={`${labelClass} mb-2`}>
+                ¿Estás invirtiendo actualmente en tu Posicionamiento Digital? <span className="text-[#E03E2D]">*</span>
+              </p>
+              <div className="space-y-2">
+                {INVERSION_OPTIONS.map((opt) => (
+                  <label
+                    key={opt.value}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl border cursor-pointer transition-all duration-150 ${
+                      form.inversion === opt.value
+                        ? 'border-[#3256D7] bg-[#3256D7]/5 dark:bg-[#3256D7]/10'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="inversion"
+                      value={opt.value}
+                      checked={form.inversion === opt.value}
+                      onChange={set('inversion')}
+                      className="accent-[#3256D7] w-4 h-4 flex-shrink-0"
+                    />
+                    <span className="text-sm text-[#414141] dark:text-gray-200">{opt.label}</span>
+                  </label>
+                ))}
               </div>
-            ))}
+            </div>
+
+            {status === 'error' && (
+              <p className="text-sm text-red-500 text-center">Ocurrió un error. Intentá nuevamente.</p>
+            )}
 
             <Button
               type="submit"
-              disabled={status === 'downloading'}
+              disabled={status === 'loading'}
               className="w-full bg-[#3256D7] hover:bg-[#2845b8] text-white rounded-full py-6 text-base font-semibold mt-2 disabled:opacity-60"
             >
-              {status === 'downloading' ? (
+              {status === 'loading' ? (
                 <span className="flex items-center gap-2">
                   <motion.span
                     animate={{ rotate: 360 }}
                     transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                     className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
                   />
-                  Descargando…
+                  Enviando…
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
@@ -173,7 +316,7 @@ const DownloadModal = ({ onClose, reduced }) => {
   );
 };
 
-// ─── Landing principal ────────────────────────────────────────────────────────
+// ─── Landing principal ─────────────────────────────────────────────────────────
 
 const InmobiliariasLanding = () => {
   const reduced = useReducedMotion();
@@ -184,11 +327,10 @@ const InmobiliariasLanding = () => {
 
   return (
     <>
-      {/* ── Hero: título + video + descarga ──────────────────────── */}
+      {/* ── Hero ─────────────────────────────────────────────────── */}
       <section className="pt-28 pb-16 px-6 md:px-10 bg-white dark:bg-[#0c0c0c]">
         <div className="container mx-auto max-w-5xl">
 
-          {/* Eyebrow */}
           <motion.p
             initial={reduced ? false : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -198,7 +340,6 @@ const InmobiliariasLanding = () => {
             Posicionarte para Inmobiliarias
           </motion.p>
 
-          {/* Headline */}
           <motion.h1
             initial={reduced ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -218,40 +359,18 @@ const InmobiliariasLanding = () => {
             Estrategias digitales que están funcionando ahora.
           </motion.p>
 
-          {/* Video + CTA — mobile: columna / desktop: lado a lado */}
+          {/* Video + CTA */}
           <div className="flex flex-col md:flex-row items-center justify-center gap-10 md:gap-16">
 
-            {/* Video vertical 9:16 */}
             <motion.div
               initial={reduced ? false : { opacity: 0, scale: 0.97, y: 24 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: 0.7, ease: EASE, delay: 0.3 }}
               className="w-full md:w-auto flex-shrink-0"
             >
-              <div className="relative mx-auto w-full max-w-[300px] sm:max-w-[340px] md:w-[260px] lg:w-[300px] aspect-[9/16] rounded-3xl overflow-hidden shadow-2xl shadow-black/15 dark:shadow-black/50 ring-1 ring-black/5 dark:ring-white/5">
-                {/* TODO: reemplazar src del video */}
-                <video
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  className="absolute inset-0 w-full h-full object-cover"
-                  aria-label="Video de presentación del Benchmark Inmobiliario"
-                >
-                  {/* Video demo — reemplazar con el video real del benchmark */}
-                  <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4" />
-                </video>
-                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/70 to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4">
-                  <div className="backdrop-blur-md rounded-2xl px-4 py-3 text-white bg-black/30">
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-white/60 mb-0.5">Benchmark</p>
-                    <p className="text-sm font-bold leading-tight">Mercado Inmobiliario Argentino 2025</p>
-                  </div>
-                </div>
-              </div>
+              <VideoPlayer />
             </motion.div>
 
-            {/* CTA de descarga */}
             <motion.div
               initial={reduced ? false : { opacity: 0, x: 24 }}
               animate={{ opacity: 1, x: 0 }}

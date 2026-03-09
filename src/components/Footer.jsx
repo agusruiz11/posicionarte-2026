@@ -41,7 +41,7 @@ const Footer = ({ hideForm = false }) => {
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#414141] dark:text-white mb-8 leading-tight tracking-tight">
               Hablemos.
             </h2>
-            <p className="text-lg md:text-xl text-[#414141]/70 mb-12 max-w-xl text-left font-light leading-relaxed">
+            <p className="text-lg md:text-xl text-[#414141]/70 dark:text-white/50 mb-12 max-w-xl text-left font-light leading-relaxed">
               Estamos listos para escuchar sobre tu proyecto y encontrar la mejor manera de ayudarte a crecer. Completá el formulario o escribinos por WhatsApp.
             </p>
           </motion.div>
@@ -56,15 +56,15 @@ const Footer = ({ hideForm = false }) => {
             <div className="grid grid-cols-1 gap-6">
               <div>
                 <Label htmlFor="name" className="text-gray-500">Nombre</Label>
-                <Input id="name" name="name" type="text" placeholder="Tu nombre completo" required />
+                <Input id="name" name="name" type="text" placeholder="Tu nombre completo" required className="rounded-2xl" />
               </div>
               <div>
                 <Label htmlFor="email" className="text-gray-500">Email</Label>
-                <Input id="email" name="email" type="email" placeholder="ejemplo@email.com" required />
+                <Input id="email" name="email" type="email" placeholder="ejemplo@email.com" required className="rounded-2xl" />
               </div>
               <div>
                 <Label htmlFor="message" className="text-gray-500">Mensaje</Label>
-                <Textarea id="message" name="message" placeholder="Contanos sobre tu proyecto..." required />
+                <Textarea id="message" name="message" placeholder="Contanos sobre tu proyecto..." required className="rounded-2xl" />
               </div>
             </div>
             <Button type="submit" className="w-full bg-[#3256D7] hover:bg-[#2845b8] text-white rounded-full py-6 text-base font-semibold">

@@ -40,7 +40,7 @@ const About = () => {
     : slideUp(0);
 
   return (
-    <section id="about" className="section-padding bg-white dark:bg-[#0c0c0c]">
+    <section id="about" className="section-padding bg-white dark:bg-[#111111]">
       <div className="container mx-auto max-w-5xl">
         <motion.p
           initial={reduced ? false : { opacity: 0, y: 12 }}

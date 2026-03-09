@@ -1,6 +1,13 @@
 node_modules
 .next/
 
-# Large video files
+# Env — nunca commitear
+.env.local
+.env*.local
+
+# Large video/PDF files — subir manualmente al servidor
 src/assets/videos/*.mp4
 src/assets/videos/*.mov
+public/videos/*.mp4
+public/videos/*.mov
+public/*.pdf

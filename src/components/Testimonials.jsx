@@ -34,7 +34,7 @@ const TestimonialCard = ({ testimonial }) => (
         <div className="text-sm text-[#666]">{testimonial.role}</div>
       </div>
     </div>
-    <p className="text-[#414141]/80 leading-relaxed text-lg">
+    <p className="text-[#414141]/80 dark:text-white/80 leading-relaxed text-lg">
       &quot;{testimonial.content}&quot;
     </p>
   </div>

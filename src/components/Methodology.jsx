@@ -44,7 +44,7 @@ const Methodology = () => {
     <section
       id="metodologia"
       ref={sectionRef}
-      className="section-padding bg-gray-50 dark:bg-[#111111]"
+      className="section-padding bg-gray-50 dark:bg-[#0c0c0c]"
     >
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div

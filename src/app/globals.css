@@ -17,3 +17,8 @@ body {
 .section-padding {
   @apply py-24 px-6 md:py-32 md:px-10;
 }
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}

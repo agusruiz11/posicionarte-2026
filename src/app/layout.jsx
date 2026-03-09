@@ -1,11 +1,18 @@
 import '@/app/globals.css';
-import { Plus_Jakarta_Sans } from 'next/font/google';
+import { Plus_Jakarta_Sans, Playfair_Display } from 'next/font/google';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/ThemeProvider';
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   variable: '--font-sans',
+  display: 'swap',
+});
+
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  weight: ['700'],
+  variable: '--font-display',
   display: 'swap',
 });
 
@@ -69,7 +76,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="es" className={jakarta.variable}>
+    <html lang="es" className={`${jakarta.variable} ${playfair.variable}`}>
       <head>
         <script
           type="application/ld+json"
