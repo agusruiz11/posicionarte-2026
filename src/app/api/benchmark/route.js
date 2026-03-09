@@ -21,7 +21,7 @@ export async function POST(request) {
 
     await resend.emails.send({
       from: 'Benchmark Inmobiliario <benchmark@posicionarte.online>',
-      to: [process.env.LEAD_EMAIL],
+      to: process.env.LEAD_EMAIL.split(',').map((e) => e.trim()),
       subject: `Nuevo lead benchmark: ${name} — ${company}`,
       html: `
         <h2 style="font-family:sans-serif;color:#3256D7;margin-bottom:16px">
