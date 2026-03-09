@@ -123,7 +123,8 @@ const INVERSION_OPTIONS = [
   { value: 'no_contesta',      label: 'Prefiero no contestar' },
 ];
 
-const PDF_PATH = 'https://drive.google.com/file/d/10yy-dPyoGqhmKY_ZQpEcMvVIMLv-8EOV/view?usp=sharing';
+const PDF_PATH     = '/benchmark-inmobiliario-2026.pdf';
+const PDF_FILENAME = 'Benchmark-Inmobiliario-Posicionarte-2026.pdf';
 
 // ─── Modal de descarga ────────────────────────────────────────────────────────
 
@@ -141,7 +142,12 @@ const DownloadModal = ({ onClose, reduced }) => {
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
 
   const triggerDownload = () => {
-    window.open(PDF_PATH, '_blank');
+    const a = document.createElement('a');
+    a.href = PDF_PATH;
+    a.download = PDF_FILENAME;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   const handleSubmit = async (e) => {

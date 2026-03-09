@@ -9,6 +9,4 @@ node_modules
 src/assets/videos/*.mp4
 src/assets/videos/*.mov
 
-# PDFs pesados — hosteados externamente
-public/*.pdf
 
