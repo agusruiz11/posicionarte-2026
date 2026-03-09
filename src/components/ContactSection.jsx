@@ -1,7 +1,6 @@
 'use client';
 
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,13 +10,30 @@ import { motion } from 'framer-motion';
 
 export default function ContactSection() {
   const { toast } = useToast();
+  const [status, setStatus] = useState('idle'); // idle | loading | done | error
+  const [form, setForm] = useState({ name: '', email: '', message: '' });
 
-  const handleSubmit = (e) => {
+  const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    toast({
-      title: '🚧 Funcionalidad en desarrollo',
-      description: '¡Esta opción estará disponible muy pronto! 🚀',
-    });
+    setStatus('loading');
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error();
+      setStatus('done');
+      setForm({ name: '', email: '', message: '' });
+      toast({ title: '¡Mensaje enviado!', description: 'Te respondemos a la brevedad.' });
+    } catch {
+      setStatus('error');
+      toast({ title: 'Algo salió mal', description: 'Intentá de nuevo o escribinos por WhatsApp.', variant: 'destructive' });
+    } finally {
+      setStatus('idle');
+    }
   };
 
   return (
@@ -37,6 +53,7 @@ export default function ContactSection() {
               Estamos listos para escuchar sobre tu proyecto y encontrar la mejor manera de ayudarte a crecer. Completá el formulario o escribinos por WhatsApp.
             </p>
           </motion.div>
+
           <motion.form
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -48,19 +65,23 @@ export default function ContactSection() {
             <div className="grid grid-cols-1 gap-6">
               <div>
                 <Label htmlFor="contact-name" className="text-gray-500">Nombre</Label>
-                <Input id="contact-name" name="name" type="text" placeholder="Tu nombre completo" required className="rounded-2xl" />
+                <Input id="contact-name" type="text" placeholder="Tu nombre completo" required value={form.name} onChange={set('name')} className="rounded-2xl" />
               </div>
               <div>
                 <Label htmlFor="contact-email" className="text-gray-500">Email</Label>
-                <Input id="contact-email" name="email" type="email" placeholder="ejemplo@email.com" required className="rounded-2xl" />
+                <Input id="contact-email" type="email" placeholder="ejemplo@email.com" required value={form.email} onChange={set('email')} className="rounded-2xl" />
               </div>
               <div>
                 <Label htmlFor="contact-message" className="text-gray-500">Mensaje</Label>
-                <Textarea id="contact-message" name="message" placeholder="Contanos sobre tu proyecto..." required className="rounded-2xl" />
+                <Textarea id="contact-message" placeholder="Contanos sobre tu proyecto..." required value={form.message} onChange={set('message')} className="rounded-2xl" />
               </div>
             </div>
-            <Button type="submit" className="w-full bg-[#3256D7] hover:bg-[#2845b8] text-white rounded-full py-6 text-base font-semibold">
-              Enviar mensaje
+            <Button
+              type="submit"
+              disabled={status === 'loading'}
+              className="w-full bg-[#3256D7] hover:bg-[#2845b8] text-white rounded-full py-6 text-base font-semibold disabled:opacity-60"
+            >
+              {status === 'loading' ? 'Enviando…' : 'Enviar mensaje'}
             </Button>
           </motion.form>
         </div>

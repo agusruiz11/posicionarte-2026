@@ -9,5 +9,3 @@ node_modules
 src/assets/videos/*.mp4
 src/assets/videos/*.mov
 
-# PDFs — subir manualmente al servidor
-public/*.pdf

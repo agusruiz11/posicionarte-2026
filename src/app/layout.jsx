@@ -57,7 +57,7 @@ export const metadata = {
       'Impulsamos tu crecimiento digital con estrategia y creatividad. Especialistas en Google Ads, Meta Ads, SEO, Diseño Web y más.',
     images: [
       {
-        url: '/og-image.jpg',
+        url: '/favicon.png',
         width: 1200,
         height: 630,
         alt: 'Posicionarte Online - Agencia de Marketing Digital',
@@ -69,7 +69,7 @@ export const metadata = {
     title: 'Posicionarte Online - Agencia de Marketing Digital',
     description:
       'Impulsamos tu crecimiento digital con estrategia y creatividad. Especialistas en Google Ads, Meta Ads, SEO, Diseño Web y más.',
-    images: ['/og-image.jpg'],
+    images: ['/favicon.png'],
   },
   robots: { index: true, follow: true },
 };
