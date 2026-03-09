@@ -112,7 +112,7 @@ const Footer = ({ hideForm = false }) => {
             <div className="flex gap-4 order-2 md:order-3">
             {/* LinkedIn */}
             <motion.a
-              href="https://www.linkedin.com/company/posicionarte-online"
+              href="https://ar.linkedin.com/company/posicionarte-online"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[#414141] dark:text-gray-400 hover:text-[#3256D7] dark:hover:text-[#3256D7] transition-colors"
@@ -133,7 +133,7 @@ const Footer = ({ hideForm = false }) => {
 
             {/* Instagram */}
             <motion.a
-              href="https://www.instagram.com/posicionarteonline"
+              href="https://www.instagram.com/posicionarte.online/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[#414141] dark:text-gray-400 hover:text-[#3256D7] dark:hover:text-[#3256D7] transition-colors"
