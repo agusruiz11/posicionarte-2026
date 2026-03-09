@@ -123,7 +123,7 @@ const INVERSION_OPTIONS = [
   { value: 'no_contesta',      label: 'Prefiero no contestar' },
 ];
 
-const PDF_PATH = 'https://drive.google.com/uc?export=download&confirm=t&id=10yy-dPyoGqhmKY_ZQpEcMvVIMLv-8EOV';
+const PDF_PATH = 'https://drive.google.com/file/d/10yy-dPyoGqhmKY_ZQpEcMvVIMLv-8EOV/view?usp=sharing';
 
 // ─── Modal de descarga ────────────────────────────────────────────────────────
 
