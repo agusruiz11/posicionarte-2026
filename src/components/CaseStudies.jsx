@@ -42,7 +42,7 @@ import luagroCarLogo from '@/assets/images/clients/logoCarrousel/luagro-transpar
 import queensLogoCar from '@/assets/images/clients/logoCarrousel/5.png'
 // ─── Darks ────────────────────────────────────────────────────────────────────────────────
 import lizzeCarDarkLogo  from '@/assets/images/clients/logoCarrousel/lizzeLogo.png'
-
+import luagroCarLogoLight from '@/assets/images/clients/logoCarrousel/luagro-transparente-red.png'
 // ─── Constantes ───────────────────────────────────────────────────────────────
 const TECH_COLORS = {
   React:      '#61dafb',
@@ -142,6 +142,7 @@ const clients = [
     links: [{ label: 'Ver sitio', url: 'https://luagro.com.ar/' }],
     logo: luagroLogo,
     logoCarousel: luagroCarLogo,
+    logoCarouselLight: luagroCarLogoLight,
   },
   {
     id: 5,

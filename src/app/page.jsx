@@ -24,7 +24,7 @@ export default function HomePage() {
         <IASection />
         <Methodology />
         <CaseStudies />
-        <Testimonials />
+        {/* <Testimonials /> */}
         <Plans />
         <CTASection />
       </main>

@@ -58,31 +58,85 @@ const VideoPlayer = () => {
   const videoRef = useRef(null);
   const [muted, setMuted] = useState(true);
   const [playing, setPlaying] = useState(true);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
+  const [hovered, setHovered] = useState(false);
+  const hideTimer = useRef(null);
+
+  const showControls = hovered || !playing;
+
+  const handleMouseEnter = () => {
+    clearTimeout(hideTimer.current);
+    setHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    hideTimer.current = setTimeout(() => setHovered(false), 300);
+  };
 
   const toggleMute = () => {
     if (!videoRef.current) return;
-    videoRef.current.muted = !muted;
-    setMuted((m) => !m);
+    const newMuted = !muted;
+    videoRef.current.muted = newMuted;
+    setMuted(newMuted);
   };
 
   const togglePlay = () => {
     if (!videoRef.current) return;
-    if (playing) {
-      videoRef.current.pause();
-    } else {
-      videoRef.current.play();
-    }
+    if (playing) videoRef.current.pause();
+    else videoRef.current.play();
     setPlaying((p) => !p);
   };
 
+  const handleTimeUpdate = () => {
+    if (!videoRef.current) return;
+    setCurrentTime(videoRef.current.currentTime);
+  };
+
+  const handleLoadedMetadata = () => {
+    if (!videoRef.current) return;
+    setDuration(videoRef.current.duration);
+  };
+
+  const handleSeek = (e) => {
+    if (!videoRef.current) return;
+    const t = Number(e.target.value);
+    videoRef.current.currentTime = t;
+    setCurrentTime(t);
+  };
+
+  const handleVolume = (e) => {
+    if (!videoRef.current) return;
+    const v = Number(e.target.value);
+    videoRef.current.volume = v;
+    videoRef.current.muted = v === 0;
+    setVolume(v);
+    setMuted(v === 0);
+  };
+
+  const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+  const pct = duration ? (currentTime / duration) * 100 : 0;
+  const volPct = muted ? 0 : volume * 100;
+
+  const rangeStyle = (fill) => ({
+    background: `linear-gradient(to right, rgba(255,255,255,0.9) ${fill}%, rgba(255,255,255,0.25) ${fill}%)`,
+  });
+
   return (
-    <div className="relative mx-auto w-full max-w-[340px] md:w-[320px] lg:w-[360px] aspect-square rounded-3xl overflow-hidden shadow-2xl shadow-black/15 dark:shadow-black/50 ring-1 ring-black/5 dark:ring-white/5">
+    <div
+      className="relative mx-auto w-full max-w-[340px] md:w-[320px] lg:w-[360px] aspect-square rounded-3xl overflow-hidden shadow-2xl shadow-black/15 dark:shadow-black/50 ring-1 ring-black/5 dark:ring-white/5"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <video
         ref={videoRef}
         autoPlay
         muted
         loop
         playsInline
+        onTimeUpdate={handleTimeUpdate}
+        onLoadedMetadata={handleLoadedMetadata}
         className="absolute inset-0 w-full h-full object-cover"
         aria-label="Video de presentación del Benchmark Inmobiliario"
       >
@@ -90,24 +144,64 @@ const VideoPlayer = () => {
       </video>
 
       {/* Gradiente inferior */}
-      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/70 to-transparent pointer-events-none" />
+      <div
+        className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/80 to-transparent pointer-events-none transition-opacity duration-300"
+        style={{ opacity: showControls ? 1 : 0 }}
+      />
 
       {/* Controles */}
-      <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-3">
-        <button
-          onClick={togglePlay}
-          aria-label={playing ? 'Pausar video' : 'Reproducir video'}
-          className="flex items-center justify-center w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-colors"
-        >
-          {playing ? <Pause size={14} /> : <Play size={14} />}
-        </button>
-        <button
-          onClick={toggleMute}
-          aria-label={muted ? 'Activar sonido' : 'Silenciar'}
-          className="flex items-center justify-center w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-colors"
-        >
-          {muted ? <VolumeX size={14} /> : <Volume2 size={14} />}
-        </button>
+      <div
+        className="absolute bottom-0 left-0 right-0 px-3 pb-3 flex flex-col gap-2 transition-opacity duration-300"
+        style={{ opacity: showControls ? 1 : 0 }}
+      >
+        {/* Línea de tiempo */}
+        <input
+          type="range"
+          min={0}
+          max={duration || 0}
+          step={0.1}
+          value={currentTime}
+          onChange={handleSeek}
+          style={rangeStyle(pct)}
+          className="w-full h-1 appearance-none rounded-full cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-sm"
+          aria-label="Línea de tiempo"
+        />
+
+        {/* Fila de controles */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={togglePlay}
+            aria-label={playing ? 'Pausar video' : 'Reproducir video'}
+            className="flex items-center justify-center w-7 h-7 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-colors flex-shrink-0"
+          >
+            {playing ? <Pause size={12} /> : <Play size={12} />}
+          </button>
+
+          <span className="text-white/70 text-[10px] tabular-nums flex-shrink-0">
+            {fmt(currentTime)} / {fmt(duration)}
+          </span>
+
+          <div className="flex items-center gap-1.5 ml-auto">
+            <button
+              onClick={toggleMute}
+              aria-label={muted ? 'Activar sonido' : 'Silenciar'}
+              className="flex items-center justify-center w-7 h-7 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-colors flex-shrink-0"
+            >
+              {muted ? <VolumeX size={12} /> : <Volume2 size={12} />}
+            </button>
+            <input
+              type="range"
+              min={0}
+              max={1}
+              step={0.05}
+              value={muted ? 0 : volume}
+              onChange={handleVolume}
+              style={rangeStyle(volPct)}
+              className="w-16 h-1 appearance-none rounded-full cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-sm"
+              aria-label="Volumen"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -328,8 +422,13 @@ const InmobiliariasLanding = () => {
   return (
     <>
       {/* ── Hero ─────────────────────────────────────────────────── */}
-      <section className="pt-28 pb-16 px-6 md:px-10 bg-white dark:bg-[#0c0c0c]">
-        <div className="container mx-auto max-w-5xl">
+      <section ref={skylineRef} className="relative pt-28 pb-0 px-6 md:px-10 bg-white dark:bg-[#0c0c0c] overflow-hidden">
+        {/* Skyline de fondo */}
+        <div className="absolute inset-x-0 bottom-0 pointer-events-none">
+          <SkylineSVG isInView={skylineInView} reduced={reduced} />
+        </div>
+
+        <div className="relative z-10 container mx-auto max-w-5xl pb-16">
 
           <motion.p
             initial={reduced ? false : { opacity: 0, y: 10 }}
@@ -360,7 +459,7 @@ const InmobiliariasLanding = () => {
           </motion.p>
 
           {/* Video + CTA */}
-          <div className="flex flex-col md:flex-row items-center justify-center gap-10 md:gap-16">
+          <div className="flex flex-col items-center justify-center gap-10">
 
             <motion.div
               initial={reduced ? false : { opacity: 0, scale: 0.97, y: 24 }}
@@ -372,10 +471,10 @@ const InmobiliariasLanding = () => {
             </motion.div>
 
             <motion.div
-              initial={reduced ? false : { opacity: 0, x: 24 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={reduced ? false : { opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, ease: EASE, delay: 0.5 }}
-              className="flex flex-col items-center md:items-start gap-6 text-center md:text-left"
+              className="flex flex-col items-center gap-6 text-center"
             >
               <motion.button
                 onClick={() => setIsModalOpen(true)}
@@ -408,11 +507,6 @@ const InmobiliariasLanding = () => {
           </div>
         </div>
       </section>
-
-      {/* ── Skyline ───────────────────────────────────────────────── */}
-      <div ref={skylineRef} className="bg-white dark:bg-[#0c0c0c] w-full -mt-2">
-        <SkylineSVG isInView={skylineInView} reduced={reduced} />
-      </div>
 
       {/* ── Modal ─────────────────────────────────────────────────── */}
       <AnimatePresence>
