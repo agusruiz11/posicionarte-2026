@@ -19,6 +19,7 @@ import lizzeLogo     from '@/assets/images/clients/logos/lizze.png';
 import dyxomaLogo    from '@/assets/images/clients/logos/dyxoma.jpg';
 import miguelLogo    from '@/assets/images/clients/logos/logoDodorico.png';
 import sanyserLogo   from '@/assets/images/clients/logos/sanyser.png';
+import sustainLogo   from '@/assets/images/clients/logos/sustainProtocol.png';
 
 // ─── Lights ───────────────────────────────────────────────────────────────────────────────
 import vesLogoCardLight   from '@/assets/images/clients/logoCards/light/VESwhite.jpg';
@@ -289,6 +290,16 @@ const clients = [
     links: [{ label: 'Ver sitio', url: 'https://tesioyvuottoestudio.com/' }],
     logoLight: tessioLogoLight,
     logoDark: tessioLogoDark,
+  },
+  {
+    id: 18,
+    name: 'Sustain Protocol',
+    initials: 'SP',
+    tipo: 'Web3 / Sustentabilidad',
+    tech: 'React',
+    services: ['web'],
+    links: [{ label: 'Ver sitio', url: 'https://sustaintoken.org/' }],
+    logo: sustainLogo, // uncomment import arriba también
   },
   // {
   //   id: 16,
