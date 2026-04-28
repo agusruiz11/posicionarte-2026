@@ -1,3 +1,29 @@
+export const metadata = {
+  title: 'Agencia de Marketing Digital Argentina | Posicionarte',
+  description:
+    'Construimos el sistema digital de tu negocio: web, ads, SEO, IA y automatización. Sin paquetes rígidos, a medida.',
+  openGraph: {
+    title: 'Agencia de Marketing Digital Argentina | Posicionarte',
+    description:
+      'Construimos el sistema digital de tu negocio: web, ads, SEO, IA y automatización. Sin paquetes rígidos, a medida.',
+    url: 'https://posicionarte.online',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Posicionarte Online - Agencia de Marketing Digital',
+      },
+    ],
+  },
+  twitter: {
+    title: 'Agencia de Marketing Digital Argentina | Posicionarte',
+    description:
+      'Construimos el sistema digital de tu negocio: web, ads, SEO, IA y automatización. Sin paquetes rígidos, a medida.',
+    images: ['/og-image.jpg'],
+  },
+};
+
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import About from '@/components/About';
