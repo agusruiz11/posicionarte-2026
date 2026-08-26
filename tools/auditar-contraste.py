@@ -110,8 +110,12 @@ def main():
             )
             pg = ctx.new_page()
             for route in ROUTES:
-                pg.goto(BASE + route, wait_until='networkidle', timeout=90000)
-                pg.wait_for_timeout(900)
+                # `networkidle` cuelga en /casos: basta con que algo mantenga
+                # una conexión abierta para que nunca se cumpla. Esperar el
+                # evento `load` y darle un margen fijo es determinista y alcanza
+                # de sobra para medir estilos ya calculados.
+                pg.goto(BASE + route, wait_until='load', timeout=60000)
+                pg.wait_for_timeout(1200)
                 # el tema tiene que estar realmente aplicado antes de medir nada
                 # Si el servidor quedó corriendo contra un build viejo, la hoja de
                 # estilos da 404 y el navegador aplica los colores por defecto:

@@ -177,6 +177,7 @@ export async function procesarLead(request, formIdForzado) {
     message: datos.message,
     serviceInterest: datos.serviceInterest,
     investmentRange: datos.investmentRange,
+    budget: datos.budget,
     objective: datos.objective,
     attribution: atribucion,
     pagePath: body.page_path,

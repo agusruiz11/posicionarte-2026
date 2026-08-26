@@ -77,6 +77,28 @@ export const CAMPOS = {
     ],
     maximo: 80,
   },
+  // Dos preguntas distintas, a propósito. `budget` es lo que la persona tiene
+  // en mente gastar; `investmentRange` es lo que gasta hoy. La primera califica
+  // la oportunidad, la segunda dice si ya trabaja con alguien.
+  //
+  // Este campo hace el trabajo que haría publicar precios en la página, sin el
+  // costo de anclarse: el que busca algo barato se autodescarta acá, y nosotros
+  // no dejamos un número escrito que después cuesta subir.
+  budget: {
+    tipo: 'select',
+    etiqueta: 'Presupuesto mensual que tenés en mente',
+    placeholder: 'Elegí un rango',
+    ayuda: 'Nos ahorra a los dos una reunión que no iba a ningún lado.',
+    opciones: [
+      { valor: 'menos_500', etiqueta: 'Menos de 500 USD por mes' },
+      { valor: '500_1000', etiqueta: 'Entre 500 y 1.000 USD' },
+      { valor: '1000_2000', etiqueta: 'Entre 1.000 y 2.000 USD' },
+      { valor: 'mas_2000', etiqueta: 'Más de 2.000 USD' },
+      { valor: 'orientar', etiqueta: 'Necesito que me orienten' },
+    ],
+    maximo: 40,
+  },
+
   investmentRange: {
     tipo: 'radio',
     etiqueta: '¿Estás invirtiendo hoy en posicionamiento digital?',
@@ -95,7 +117,7 @@ export const FORMULARIOS = {
   contacto: {
     id: 'contacto',
     base: ['name', 'email', 'message'],
-    extra: ['phone', 'serviceInterest'],
+    extra: ['phone', 'serviceInterest', 'budget'],
     requeridos: ['name', 'email', 'message'],
     boton: 'Enviar consulta',
     botonEnviando: 'Enviando...',

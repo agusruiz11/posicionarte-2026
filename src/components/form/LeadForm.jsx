@@ -183,6 +183,7 @@ export default function LeadForm({
         form_id: formId,
         ...(datos.serviceInterest ? { servicio_interes: datos.serviceInterest } : {}),
         ...(datos.investmentRange ? { rango_inversion: datos.investmentRange } : {}),
+        ...(datos.budget ? { presupuesto: datos.budget } : {}),
         ...(datos.objective ? { objetivo: datos.objective } : {}),
       });
 
