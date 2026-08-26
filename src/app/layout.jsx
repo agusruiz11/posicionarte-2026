@@ -2,6 +2,11 @@ import '@/app/globals.css';
 import { Plus_Jakarta_Sans, Playfair_Display } from 'next/font/google';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import Analytics from '@/components/Analytics';
+import { Analytics as VercelAnalytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import { schemaSitio } from '@/lib/schema';
+import { MARCA, SITE_URL } from '@/data/marca';
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -16,62 +21,39 @@ const playfair = Playfair_Display({
   display: 'swap',
 });
 
-const SITE_URL = 'https://posicionarte.online';
-
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'LocalBusiness',
-  name: 'Posicionarte Online',
-  description:
-    'Impulsamos tu crecimiento digital con estrategia y creatividad. Especialistas en Google Ads, Meta Ads, SEO, Diseño Web y más.',
-  url: SITE_URL,
-  logo: `${SITE_URL}/favicon.png`,
-  sameAs: [
-    'https://www.linkedin.com/company/posicionarte-online',
-    'https://www.instagram.com/posicionarteonline',
-    'https://www.facebook.com/posicionarteonline',
-  ],
-  serviceType: ['Google Ads', 'Meta Ads', 'SEO', 'Diseño Web', 'Social Media', 'Estrategia Digital'],
-  areaServed: 'AR',
-};
-
 export const metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: 'Posicionarte Online - Agencia de Marketing Digital',
     template: '%s | Posicionarte Online',
   },
-  description:
-    'Impulsamos tu crecimiento digital con estrategia y creatividad. Especialistas en Google Ads, Meta Ads, SEO, Diseño Web y más.',
+  description: MARCA.descripcion,
   icons: {
     icon: '/favicon.png',
     type: 'image/png',
   },
+  // Las imágenes de Open Graph las genera Next desde los archivos
+  // `opengraph-image.jsx` de cada ruta. No se declaran acá: si se declaran,
+  // pisan al archivo y volvemos al problema de tener la URL escrita a mano.
   openGraph: {
     type: 'website',
     locale: 'es_AR',
     url: SITE_URL,
-    siteName: 'Posicionarte Online',
+    siteName: MARCA.nombre,
     title: 'Posicionarte Online - Agencia de Marketing Digital',
-    description:
-      'Impulsamos tu crecimiento digital con estrategia y creatividad. Especialistas en Google Ads, Meta Ads, SEO, Diseño Web y más.',
-    images: [
-      {
-        url: '/og-image.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'Posicionarte Online - Agencia de Marketing Digital',
-      },
-    ],
+    description: MARCA.descripcion,
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Posicionarte Online - Agencia de Marketing Digital',
-    description:
-      'Impulsamos tu crecimiento digital con estrategia y creatividad. Especialistas en Google Ads, Meta Ads, SEO, Diseño Web y más.',
-    images: ['/og-image.jpg'],
+    description: MARCA.descripcion,
   },
-  robots: { index: true, follow: true },
+  alternates: { canonical: '/' },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
+  },
 };
 
 export default function RootLayout({ children }) {
@@ -80,19 +62,22 @@ export default function RootLayout({ children }) {
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaSitio) }}
         />
       </head>
-      <body className="min-h-screen bg-white dark:bg-[#0c0c0c] dark:text-white transition-colors duration-300">
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+      <body className="min-h-screen bg-surface-0 text-ink transition-colors duration-300">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <a
             href="#main-content"
-            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-[#3256D7] focus:text-white focus:rounded-full focus:text-sm focus:font-semibold"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-full focus:text-sm focus:font-semibold"
           >
             Saltar al contenido principal
           </a>
           {children}
           <Toaster />
+          <Analytics />
+          <VercelAnalytics />
+          <SpeedInsights />
         </ThemeProvider>
       </body>
     </html>

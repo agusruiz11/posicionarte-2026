@@ -3,22 +3,45 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Linkedin, Instagram } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { motion } from 'framer-motion';
+import { EVENTS, track, trackConversion, whatsappUrl, trackWhatsApp } from '@/lib/analytics';
+import { getAttribution } from '@/lib/attribution';
+import CamposLegales from '@/components/form/CamposLegales';
+import { CONTACTO, UBICACION, REDES } from '@/data/marca';
+import { BENCHMARK } from '@/data/benchmark';
 import logoOnline from '@/assets/logo/logo-online.png';
+import Section from '@/components/Section';
+import Reveal from '@/components/Reveal';
+
+const FORM_ID = 'footer';
 
 const Footer = ({ hideForm = false }) => {
+  // Se dispara una sola vez, en el primer tecleo: mide cuánta gente empieza el
+  // formulario y no lo termina.
+  const empezado = React.useRef(false);
+  const marcarInicio = () => {
+    if (empezado.current) return;
+    empezado.current = true;
+    track(EVENTS.FORM_START, { form_id: FORM_ID });
+  };
+
   const year = new Date().getFullYear();
   const { toast } = useToast();
   const [status, setStatus] = React.useState('idle');
   const [form, setForm] = React.useState({ name: '', email: '', message: '' });
+  const [consent, setConsent] = React.useState(false);
+  // Marca de tiempo de apertura: un envío casi instantáneo es un bot.
+  const abiertoEn = React.useRef(Date.now());
 
-  const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
+  const set = (key) => (e) => {
+    marcarInicio();
+    setForm((f) => ({ ...f, [key]: e.target.value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,11 +50,18 @@ const Footer = ({ hideForm = false }) => {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          ...getAttribution(),
+          form_id: FORM_ID,
+          form_elapsed_ms: Date.now() - abiertoEn.current,
+        }),
       });
       if (!res.ok) throw new Error();
+      trackConversion(EVENTS.GENERATE_LEAD, { form_id: FORM_ID });
       setStatus('done');
       setForm({ name: '', email: '', message: '' });
+      setConsent(false);
       toast({ title: '¡Mensaje enviado!', description: 'Te respondemos a la brevedad.' });
     } catch {
       setStatus('error');
@@ -46,76 +76,135 @@ const Footer = ({ hideForm = false }) => {
   };
 
   return (
-    <footer id="footer" className="section-padding bg-white dark:bg-[#0c0c0c]">
+    <Section as="footer" id="footer" variant="default">
       <div className="container mx-auto">
         {!hideForm && <div className="grid md:grid-cols-2 gap-16 mb-12">
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-          >
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#414141] dark:text-white mb-8 leading-tight tracking-tight">
+          <Reveal>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-ink mb-8 leading-tight tracking-tight">
               Hablemos.
             </h2>
-            <p className="text-lg md:text-xl text-[#414141]/70 dark:text-white/50 mb-12 max-w-xl text-left font-light leading-relaxed">
+            <p className="text-lg md:text-xl text-ink/80 mb-12 max-w-xl text-left font-light leading-relaxed">
               Estamos listos para escuchar sobre tu proyecto y encontrar la mejor manera de ayudarte a crecer. Completá el formulario o escribinos por WhatsApp.
             </p>
-          </motion.div>
-          <motion.form
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-            onSubmit={handleSubmit}
-            className="space-y-6"
-          >
+          </Reveal>
+          <Reveal as="form" delay={90} onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 gap-6">
               <div>
-                <Label htmlFor="footer-name" className="text-gray-500">Nombre</Label>
+                <Label htmlFor="footer-name" className="text-ink-muted">Nombre</Label>
                 <Input id="footer-name" type="text" placeholder="Tu nombre completo" required value={form.name} onChange={set('name')} className="rounded-2xl" />
               </div>
               <div>
-                <Label htmlFor="footer-email" className="text-gray-500">Email</Label>
+                <Label htmlFor="footer-email" className="text-ink-muted">Email</Label>
                 <Input id="footer-email" type="email" placeholder="ejemplo@email.com" required value={form.email} onChange={set('email')} className="rounded-2xl" />
               </div>
               <div>
-                <Label htmlFor="footer-message" className="text-gray-500">Mensaje</Label>
+                <Label htmlFor="footer-message" className="text-ink-muted">Mensaje</Label>
                 <Textarea id="footer-message" placeholder="Contanos sobre tu proyecto..." required value={form.message} onChange={set('message')} className="rounded-2xl" />
               </div>
             </div>
-            <Button type="submit" disabled={status === 'loading'} className="w-full bg-[#3256D7] hover:bg-[#2845b8] text-white rounded-full py-6 text-base font-semibold disabled:opacity-60">
+            <CamposLegales formId="footer" aceptado={consent} onAceptar={setConsent} />
+
+            <Button type="submit" disabled={status === 'loading' || !consent} className="w-full bg-primary hover:bg-primary-hover text-white rounded-full py-6 text-base font-semibold disabled:opacity-60">
               {status === 'loading' ? 'Enviando…' : 'Enviar mensaje'}
             </Button>
-          </motion.form>
+          </Reveal>
         </div>}
 
-        <div className="border-t border-gray-200 dark:border-gray-800 pt-8 mt-12">
+        {/* Navegación y datos de contacto. El footer no tenía ni un enlace: se
+            perdía enlazado interno para SEO y el visitante que prefiere un mail
+            no encontraba ninguno. */}
+        <div className="border-t border-hairline pt-12 mt-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+          <nav aria-labelledby="footer-nav-sitio">
+            <h3 id="footer-nav-sitio" className="text-sm font-semibold text-ink mb-4">Sitio</h3>
+            <ul className="space-y-2.5 text-sm">
+              <li><Link href="/" className="text-ink-muted hover:text-brand transition-colors">Inicio</Link></li>
+              <li><Link href="/servicios" className="text-ink-muted hover:text-brand transition-colors">Servicios</Link></li>
+              <li><Link href="/casos" className="text-ink-muted hover:text-brand transition-colors">Casos</Link></li>
+              <li><Link href="/contacto" className="text-ink-muted hover:text-brand transition-colors">Contacto</Link></li>
+            </ul>
+          </nav>
+
+          <nav aria-labelledby="footer-nav-verticales">
+            <h3 id="footer-nav-verticales" className="text-sm font-semibold text-ink mb-4">Verticales</h3>
+            <ul className="space-y-2.5 text-sm">
+              <li>
+                <Link href="/inmobiliarias" className="text-ink-muted hover:text-brand transition-colors">
+                  Inmobiliarias
+                </Link>
+              </li>
+              <li>
+                <Link href="/inmobiliarias" className="text-ink-muted hover:text-brand transition-colors">
+                  {BENCHMARK.tituloCompleto}
+                </Link>
+              </li>
+            </ul>
+          </nav>
+
+          <div>
+            <h3 className="text-sm font-semibold text-ink mb-4">Contacto</h3>
+            <ul className="space-y-2.5 text-sm">
+              <li>
+                <a
+                  href={whatsappUrl('footer')}
+                  onClick={() => trackWhatsApp('footer')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-ink-muted hover:text-brand transition-colors"
+                >
+                  WhatsApp {CONTACTO.telefonoVisible}
+                </a>
+              </li>
+              <li>
+                <a href={`mailto:${CONTACTO.email}`} className="text-ink-muted hover:text-brand transition-colors">
+                  {CONTACTO.email}
+                </a>
+              </li>
+              <li className="text-ink-muted">{UBICACION.visible}</li>
+              <li className="text-ink-subtle">Trabajamos 100% online</li>
+              <li>
+                <a href={CONTACTO.crm} className="text-ink-muted hover:text-brand transition-colors">
+                  Acceso a clientes
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <nav aria-labelledby="footer-nav-legal">
+            <h3 id="footer-nav-legal" className="text-sm font-semibold text-ink mb-4">Legales</h3>
+            <ul className="space-y-2.5 text-sm">
+              <li><Link href="/privacidad" className="text-ink-muted hover:text-brand transition-colors">Política de privacidad</Link></li>
+              <li><Link href="/terminos" className="text-ink-muted hover:text-brand transition-colors">Términos de uso</Link></li>
+            </ul>
+          </nav>
+        </div>
+
+        <div className="border-t border-hairline pt-8 mt-12">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <motion.button
               onClick={scrollToTop}
+              aria-label="Volver arriba"
               className="hover:opacity-80 transition-opacity"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               <Image
                 src={logoOnline}
-                alt="Posicionarte .online"
-                width={200}
-                height={48}
-                className="h-16 md:h-24 lg:h-32 w-[200px] md:w-[300px] lg:w-[300px] object-contain object-left"
+                alt=""
+                width={300}
+                height={72}
+                className="h-16 md:h-20 w-auto object-contain object-left"
               />
             </motion.button>
-            <p className="pt-8 text-center text-[#414141]/60 dark:text-gray-500">
+            <p className="text-center text-ink-muted text-sm">
               © {year} Posicionarte Online. Todos los derechos reservados.
             </p>
             <div className="flex gap-4 order-2 md:order-3">
             {/* LinkedIn */}
             <motion.a
-              href="https://ar.linkedin.com/company/posicionarte-online"
+              href={REDES.linkedin}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#414141] dark:text-gray-400 hover:text-[#3256D7] dark:hover:text-[#3256D7] transition-colors"
+              className="text-ink-muted hover:text-brand transition-colors"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               aria-label="LinkedIn"
@@ -133,10 +222,10 @@ const Footer = ({ hideForm = false }) => {
 
             {/* Instagram */}
             <motion.a
-              href="https://www.instagram.com/posicionarte.online/"
+              href={REDES.instagram}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#414141] dark:text-gray-400 hover:text-[#3256D7] dark:hover:text-[#3256D7] transition-colors"
+              className="text-ink-muted hover:text-brand transition-colors"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               aria-label="Instagram"
@@ -154,10 +243,10 @@ const Footer = ({ hideForm = false }) => {
 
             {/* Facebook */}
             <motion.a
-              href="https://www.facebook.com/posicionarteonline"
+              href={REDES.facebook}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#414141] dark:text-gray-400 hover:text-[#3256D7] dark:hover:text-[#3256D7] transition-colors"
+              className="text-ink-muted hover:text-brand transition-colors"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               aria-label="Facebook"
@@ -177,7 +266,7 @@ const Footer = ({ hideForm = false }) => {
           </div>
         </div>
       </div>
-    </footer>
+    </Section>
   );
 };
 

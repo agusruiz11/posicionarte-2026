@@ -3,12 +3,16 @@ import WhatsAppButton from '@/components/WhatsAppButton';
 import Footer from '@/components/Footer';
 import InmobiliariasLanding from '@/components/InmobiliariasLanding';
 
+import { BENCHMARK } from '@/data/benchmark';
+
 export const metadata = {
-  title: 'Benchmark Inmobiliario — Descargá gratis el informe 2025',
+  title: `${BENCHMARK.titulo} — Descargá gratis el informe ${BENCHMARK.anio}`,
   description:
-    'Análisis de tendencias, precios y comportamiento del mercado inmobiliario argentino. Descargá gratis el Benchmark Inmobiliario 2025 de Posicionarte Online.',
+    `Análisis de tendencias, precios y comportamiento del mercado inmobiliario argentino. Descargá gratis el ${BENCHMARK.tituloCompleto} de Posicionarte Online.`,
+  alternates: { canonical: '/inmobiliarias' },
   openGraph: {
-    title: 'Benchmark Inmobiliario 2025 | Posicionarte Online',
+    url: '/inmobiliarias',
+    title: `${BENCHMARK.tituloCompleto} | Posicionarte Online`,
     description:
       'Análisis de tendencias, precios y comportamiento del mercado inmobiliario argentino. Descargá gratis el informe.',
   },
@@ -16,7 +20,7 @@ export const metadata = {
 
 export default function InmobiliariasPage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0c0c0c]">
+    <div className="min-h-screen bg-surface-0">
       <Navbar />
       <main id="main-content">
         <InmobiliariasLanding />

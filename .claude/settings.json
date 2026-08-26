@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git check-ignore *)",
+      "Bash(curl -s https://api.github.com/repos/agusruiz11/posicionarte-2026)",
+      "Bash(git grep *)",
+      "Bash(grep -viE '\\(process\\\\.env|YOUR_|<your|example|placeholder|\\\\$\\\\{|xxx|REPLACE|foo|bar|dummy|test|\\\\.\\\\.\\\\.\\)')",
+      "Bash(grep -iE '\\(\\\\.env|credential|secret|\\\\.pem$|\\\\.key$|serviceaccount|\\\\.p12$\\)')"
+    ]
+  }
+}

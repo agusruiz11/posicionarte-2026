@@ -2,8 +2,12 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useReducedMotion } from '@/lib/use-reduced-motion';
+import { whatsappUrl, trackWhatsApp } from '@/lib/analytics';
 
 const WhatsAppButton = () => {
+  const reduced = useReducedMotion();
+
   return (
     <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
       {/* Tooltip */}
@@ -19,7 +23,8 @@ const WhatsAppButton = () => {
 
       {/* Button */}
       <motion.a
-        href="https://wa.me/5491172360193"
+        href={whatsappUrl('boton-flotante')}
+        onClick={() => trackWhatsApp('boton-flotante')}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Contactar por WhatsApp"
@@ -30,11 +35,13 @@ const WhatsAppButton = () => {
         whileTap={{ scale: 0.9 }}
       >
         {/* Anillo pulsante */}
-        <motion.span
-          className="absolute inset-0 rounded-full bg-[#25D366]"
-          animate={{ scale: [1, 1.25, 1], opacity: [0.6, 0, 0.6] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-        />
+        {!reduced && (
+          <motion.span
+            className="absolute inset-0 rounded-full bg-[#25D366]"
+            animate={{ scale: [1, 1.25, 1], opacity: [0.6, 0, 0.6] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        )}
 
         {/* Botón principal */}
         <motion.span

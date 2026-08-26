@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import Section from '@/components/Section';
+import Reveal from '@/components/Reveal';
 
 const steps = [
   {
@@ -37,30 +37,21 @@ const steps = [
 ];
 
 const Methodology = () => {
-  const sectionRef = useRef(null);
-  const isInView = useInView(sectionRef, { once: true, amount: 0.1 });
-
   return (
-    <section
+    <Section
       id="metodologia"
-      ref={sectionRef}
-      className="section-padding bg-gray-50 dark:bg-[#0c0c0c]"
+      variant="alt"
     >
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16 md:mb-24"
-        >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#414141] dark:text-white mb-4">
-            Un proceso <span className="text-[#3256D7]">claro</span> y{' '}
-            <span className="text-[#3256D7]">efectivo</span>
+        <Reveal className="text-center mb-16 md:mb-24">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-ink mb-4">
+            Un proceso <span className="text-brand">claro</span> y{' '}
+            <span className="text-brand">efectivo</span>
           </h2>
-          <p className="text-lg md:text-xl text-gray-500">
+          <p className="text-lg md:text-xl text-ink-muted">
             Nuestra metodología probada garantiza resultados medibles y sostenibles para tu negocio.
           </p>
-        </motion.div>
+        </Reveal>
 
         <div className="relative">
           {/* Línea del timeline - solo desktop */}
@@ -69,21 +60,22 @@ const Methodology = () => {
           {/* Pasos */}
           <div className="space-y-12 md:space-y-20 relative">
             {steps.map((step, index) => (
-              <motion.div
+              <Reveal
                 key={step.title}
-                initial={{ opacity: 0, x: -50 }}
-                animate={
-                  isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }
-                }
-                transition={{ duration: 0.6, delay: index * 0.15 }}
+                delay={index * 110}
                 className="relative md:pl-24"
               >
                 {/* Punto del timeline - desktop */}
-                <div className="hidden md:block absolute left-6 w-4 h-4 bg-[#3256D7] rounded-full border-4 border-gray-50 shadow-lg z-10 top-2" />
+                <div className="hidden md:block absolute left-6 w-4 h-4 bg-primary rounded-full border-4 border-surface-1 shadow-lg z-10 top-2" />
 
-                {/* Número del paso - móvil */}
-                <div className="md:hidden mb-4">
-                  <span className="text-6xl font-bold text-[#3256D7]/20">
+                {/* Número del paso - móvil.
+                    Los números gigantes son textura, no contenido: el título que
+                    tienen al lado ya dice cuál es el paso. Con aria-hidden el
+                    lector de pantalla deja de leer "cero uno" antes de cada uno
+                    y quedan declarados como decorativos, que es lo que los exime
+                    del mínimo de contraste (hoy dan 1,34:1 a propósito). */}
+                <div className="md:hidden mb-4" aria-hidden="true">
+                  <span className="text-6xl font-bold text-brand/20">
                     {step.number}
                   </span>
                 </div>
@@ -92,23 +84,26 @@ const Methodology = () => {
                 <div className="flex-1">
                   <div className="flex items-center gap-4 mb-4">
                     {/* Número del paso - desktop */}
-                    <span className="hidden md:block text-7xl lg:text-8xl font-bold text-[#3256D7]/20 leading-none">
+                    <span
+                      aria-hidden="true"
+                      className="hidden md:block text-7xl lg:text-8xl font-bold text-brand/20 leading-none"
+                    >
                       {step.number}
                     </span>
-                    <h3 className="text-2xl md:text-3xl font-bold text-[#414141] dark:text-white">
+                    <h3 className="text-2xl md:text-3xl font-bold text-ink">
                       {step.title}
                     </h3>
                   </div>
-                  <p className="text-lg text-gray-500 leading-relaxed max-w-2xl">
+                  <p className="text-lg text-ink-muted leading-relaxed max-w-2xl">
                     {step.description}
                   </p>
                 </div>
-              </motion.div>
+              </Reveal>
             ))}
           </div>
         </div>
       </div>
-    </section>
+    </Section>
   );
 };
 

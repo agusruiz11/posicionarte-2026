@@ -9,6 +9,12 @@ import { useToast } from '@/components/ui/use-toast';
 import { useReducedMotion } from '@/lib/use-reduced-motion';
 import { EASE } from '@/lib/motion';
 import { X, Download, CheckCircle, Play, Pause, Volume2, VolumeX } from 'lucide-react';
+import { BENCHMARK } from '@/data/benchmark';
+import { EVENTS, track, trackConversion } from '@/lib/analytics';
+import { getAttribution } from '@/lib/attribution';
+import CamposLegales from '@/components/form/CamposLegales';
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogClose } from '@/components/ui/dialog';
+import Section from '@/components/Section';
 
 // ─── Skyline SVG ──────────────────────────────────────────────────────────────
 
@@ -42,7 +48,7 @@ const SkylineSVG = ({ isInView, reduced }) => (
         width={b.w}
         rx={2}
         fill="currentColor"
-        className="text-[#414141]/10 dark:text-white/[0.06]"
+        className="text-ink/10 /[0.06]"
         initial={{ y: 200, height: 0 }}
         animate={isInView ? { y: 200 - b.h, height: b.h } : { y: 200, height: 0 }}
         transition={reduced ? { duration: 0 } : { duration: 0.7, delay: i * 0.04, ease: EASE }}
@@ -57,7 +63,11 @@ const SkylineSVG = ({ isInView, reduced }) => (
 const VideoPlayer = () => {
   const videoRef = useRef(null);
   const [muted, setMuted] = useState(true);
-  const [playing, setPlaying] = useState(true);
+  // Arranca en pausa. Antes tenía autoPlay sin `preload`, así que la landing
+  // se descargaba 11,7 MB de video antes de que nadie decidiera verlo — en
+  // celular eso es la conversión antes de leer el titular.
+  const [playing, setPlaying] = useState(false);
+  const [iniciado, setIniciado] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
@@ -84,8 +94,15 @@ const VideoPlayer = () => {
 
   const togglePlay = () => {
     if (!videoRef.current) return;
-    if (playing) videoRef.current.pause();
-    else videoRef.current.play();
+    if (playing) {
+      videoRef.current.pause();
+    } else {
+      if (!iniciado) {
+        setIniciado(true);
+        track(EVENTS.CTA_CLICK, { cta_text: 'Reproducir video', cta_location: 'inmobiliarias' });
+      }
+      videoRef.current.play();
+    }
     setPlaying((p) => !p);
   };
 
@@ -131,17 +148,32 @@ const VideoPlayer = () => {
     >
       <video
         ref={videoRef}
-        autoPlay
         muted
         loop
         playsInline
+        preload="none"
+        poster="/videos/video-landing-inmobiliaria-poster.jpg"
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
+        onEnded={() => setPlaying(false)}
         className="absolute inset-0 w-full h-full object-cover"
         aria-label="Video de presentación del Benchmark Inmobiliario"
       >
         <source src="/videos/video-landing-inmobiliaria.mp4" type="video/mp4" />
       </video>
+
+      {/* Botón de play grande sobre el póster, hasta que alguien lo arranca */}
+      {!iniciado && (
+        <button
+          onClick={togglePlay}
+          aria-label="Reproducir el video de presentación"
+          className="absolute inset-0 flex items-center justify-center bg-black/25 hover:bg-black/35 transition-colors group"
+        >
+          <span className="flex items-center justify-center w-16 h-16 rounded-full bg-white/95 text-[#0C0C0C] shadow-xl group-hover:scale-105 transition-transform">
+            <Play size={26} className="ml-1" fill="currentColor" />
+          </span>
+        </button>
+      )}
 
       {/* Gradiente inferior */}
       <div
@@ -172,12 +204,15 @@ const VideoPlayer = () => {
           <button
             onClick={togglePlay}
             aria-label={playing ? 'Pausar video' : 'Reproducir video'}
-            className="flex items-center justify-center w-7 h-7 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-colors flex-shrink-0"
+            className="flex items-center justify-center w-7 h-7 rounded-full bg-black/70 backdrop-blur-sm text-white hover:bg-black/85 transition-colors flex-shrink-0"
           >
             {playing ? <Pause size={12} /> : <Play size={12} />}
           </button>
 
-          <span className="text-white/70 text-[10px] tabular-nums flex-shrink-0">
+          {/* El contador flotaba directo sobre el video: sobre un fotograma
+              claro desaparecía. Va con el mismo fondo que el botón de play, que
+              es lo que le garantiza contraste sin importar qué se esté viendo. */}
+          <span className="text-white text-[11px] tabular-nums flex-shrink-0 rounded-full bg-black/70 backdrop-blur-sm px-2 py-0.5">
             {fmt(currentTime)} / {fmt(duration)}
           </span>
 
@@ -185,7 +220,7 @@ const VideoPlayer = () => {
             <button
               onClick={toggleMute}
               aria-label={muted ? 'Activar sonido' : 'Silenciar'}
-              className="flex items-center justify-center w-7 h-7 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-colors flex-shrink-0"
+              className="flex items-center justify-center w-7 h-7 rounded-full bg-black/70 backdrop-blur-sm text-white hover:bg-black/85 transition-colors flex-shrink-0"
             >
               {muted ? <VolumeX size={12} /> : <Volume2 size={12} />}
             </button>
@@ -217,12 +252,12 @@ const INVERSION_OPTIONS = [
   { value: 'no_contesta',      label: 'Prefiero no contestar' },
 ];
 
-const PDF_PATH     = '/benchmark-inmobiliario-2026.pdf';
-const PDF_FILENAME = 'Benchmark-Inmobiliario-Posicionarte-2026.pdf';
+const PDF_PATH     = BENCHMARK.archivo;
+const PDF_FILENAME = BENCHMARK.nombreDescarga;
 
 // ─── Modal de descarga ────────────────────────────────────────────────────────
 
-const DownloadModal = ({ onClose, reduced }) => {
+const DownloadModal = ({ abierto, onAbrir, disparadorRef }) => {
   const { toast } = useToast();
   const [status, setStatus] = useState('idle'); // idle | loading | done | error
   const [form, setForm] = useState({
@@ -232,8 +267,19 @@ const DownloadModal = ({ onClose, reduced }) => {
     phone: '',
     inversion: '',
   });
+  const [consent, setConsent] = useState(false);
+  // Marca de tiempo de apertura: un envío casi instantáneo es un bot.
+  const abiertoEn = useRef(Date.now());
 
-  const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
+  // Se dispara una sola vez, en el primer tecleo.
+  const empezado = useRef(false);
+  const set = (key) => (e) => {
+    if (!empezado.current) {
+      empezado.current = true;
+      track(EVENTS.FORM_START, { form_id: 'benchmark' });
+    }
+    setForm((f) => ({ ...f, [key]: e.target.value }));
+  };
 
   const triggerDownload = () => {
     const a = document.createElement('a');
@@ -242,6 +288,7 @@ const DownloadModal = ({ onClose, reduced }) => {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+    track(EVENTS.FILE_DOWNLOAD, { file_name: BENCHMARK.nombreDescarga });
   };
 
   const handleSubmit = async (e) => {
@@ -255,9 +302,19 @@ const DownloadModal = ({ onClose, reduced }) => {
       const res = await fetch('/api/benchmark', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          ...getAttribution(),
+          form_id: 'benchmark',
+          form_elapsed_ms: Date.now() - abiertoEn.current,
+        }),
       });
       if (!res.ok) throw new Error();
+      trackConversion(EVENTS.GENERATE_LEAD, {
+        form_id: 'benchmark',
+        servicio_interes: 'benchmark-inmobiliario',
+        rango_inversion: form.inversion,
+      });
       triggerDownload();
       setStatus('done');
       toast({ title: '¡Descarga iniciada!', description: 'El benchmark está en tu carpeta de descargas.' });
@@ -267,75 +324,63 @@ const DownloadModal = ({ onClose, reduced }) => {
     }
   };
 
-  const inputClass = 'dark:bg-[#111111] dark:border-gray-700 dark:text-white dark:placeholder:text-gray-600 mt-1 rounded-xl';
-  const labelClass = 'text-gray-500 dark:text-gray-400 text-sm';
+  // El componente Input ya resuelve fondo, borde y placeholder por token en
+  // los dos temas; acá solo queda el ajuste de forma.
+  const inputClass = 'mt-1 rounded-xl';
+  const labelClass = 'text-ink-muted text-sm';
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.25 }}
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-end sm:items-center justify-center p-4"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
-    >
-      <motion.div
-        initial={reduced ? { opacity: 0 } : { opacity: 0, y: 60 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={reduced ? { opacity: 0 } : { opacity: 0, y: 40 }}
-        transition={{ duration: 0.4, ease: EASE }}
-        className="bg-white dark:bg-[#1a1a1a] rounded-3xl p-8 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto"
+    <Dialog open={abierto} onOpenChange={onAbrir}>
+      <DialogContent
+        etiquetaCerrar="Cerrar el formulario de descarga"
+        onCloseAutoFocus={(e) => {
+          e.preventDefault();
+          disparadorRef?.current?.focus();
+        }}
       >
-        <div className="flex justify-between items-start mb-6">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-[#3256D7] mb-1">Descarga gratuita</p>
-            <h3 className="text-2xl font-bold text-[#414141] dark:text-white leading-tight">
-              Completá el formulario<br />para descargar
-            </h3>
-          </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-[#414141] dark:hover:text-white transition-colors mt-1" aria-label="Cerrar">
-            <X size={20} />
-          </button>
+        <div className="mb-6 pr-8">
+          <p className="text-xs font-semibold uppercase tracking-widest text-brand mb-1">Descarga gratuita</p>
+          <DialogTitle>
+            Completá el formulario<br />para descargar
+          </DialogTitle>
+          <DialogDescription className="sr-only">
+            Formulario para recibir el {BENCHMARK.tituloCompleto} en PDF.
+          </DialogDescription>
         </div>
 
         {status === 'done' ? (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.35, ease: EASE }}
-            className="flex flex-col items-center text-center py-6 gap-4"
-          >
-            <CheckCircle size={48} className="text-[#3256D7]" strokeWidth={1.5} />
-            <p className="text-lg font-semibold text-[#414141] dark:text-white">¡Tu descarga comenzó!</p>
-            <p className="text-gray-500 text-sm">Revisá tu carpeta de descargas.</p>
+          <div className="flex flex-col items-center text-center py-6 gap-4" role="status" aria-live="polite">
+            <CheckCircle size={48} className="text-brand" strokeWidth={1.5} />
+            <p className="text-lg font-semibold text-ink">¡Tu descarga comenzó!</p>
+            <p className="text-ink-muted text-sm">Revisá tu carpeta de descargas.</p>
             <button
               onClick={triggerDownload}
-              className="text-[#3256D7] text-sm font-medium underline underline-offset-2 hover:no-underline transition-all"
+              className="text-brand text-sm font-medium underline underline-offset-2 hover:no-underline transition-all"
             >
               Volver a descargar
             </button>
-            <Button onClick={onClose} variant="outline" className="rounded-full mt-2 dark:border-gray-700 dark:text-gray-200">
-              Cerrar
-            </Button>
-          </motion.div>
+            <DialogClose asChild>
+              <Button variant="outline" className="rounded-full mt-2">Cerrar</Button>
+            </DialogClose>
+          </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
 
             {/* Nombre */}
             <div>
-              <Label htmlFor="f-name" className={labelClass}>Nombre <span className="text-[#E03E2D]">*</span></Label>
+              <Label htmlFor="f-name" className={labelClass}>Nombre <span className="text-destructive">*</span></Label>
               <Input id="f-name" type="text" placeholder="Tu nombre completo" required value={form.name} onChange={set('name')} className={inputClass} />
             </div>
 
             {/* Inmobiliaria */}
             <div>
-              <Label htmlFor="f-company" className={labelClass}>Inmobiliaria <span className="text-[#E03E2D]">*</span></Label>
+              <Label htmlFor="f-company" className={labelClass}>Inmobiliaria <span className="text-destructive">*</span></Label>
               <Input id="f-company" type="text" placeholder="Nombre de tu inmobiliaria" required value={form.company} onChange={set('company')} className={inputClass} />
             </div>
 
             {/* Email */}
             <div>
-              <Label htmlFor="f-email" className={labelClass}>Mail <span className="text-[#E03E2D]">*</span></Label>
+              <Label htmlFor="f-email" className={labelClass}>Mail <span className="text-destructive">*</span></Label>
               <Input id="f-email" type="email" placeholder="ejemplo@inmobiliaria.com" required value={form.email} onChange={set('email')} className={inputClass} />
             </div>
 
@@ -348,16 +393,15 @@ const DownloadModal = ({ onClose, reduced }) => {
             {/* Inversión */}
             <div>
               <p className={`${labelClass} mb-2`}>
-                ¿Estás invirtiendo actualmente en tu Posicionamiento Digital? <span className="text-[#E03E2D]">*</span>
+                ¿Estás invirtiendo actualmente en tu Posicionamiento Digital? <span className="text-destructive">*</span>
               </p>
               <div className="space-y-2">
                 {INVERSION_OPTIONS.map((opt) => (
                   <label
                     key={opt.value}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl border cursor-pointer transition-all duration-150 ${
-                      form.inversion === opt.value
-                        ? 'border-[#3256D7] bg-[#3256D7]/5 dark:bg-[#3256D7]/10'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl border cursor-pointer transition-all duration-150 ${ form.inversion === opt.value
+                        ? 'border-brand bg-primary/5 dark:bg-primary/10'
+                        : 'border-hairline hover:border-ink/25'
                     }`}
                   >
                     <input
@@ -368,11 +412,13 @@ const DownloadModal = ({ onClose, reduced }) => {
                       onChange={set('inversion')}
                       className="accent-[#3256D7] w-4 h-4 flex-shrink-0"
                     />
-                    <span className="text-sm text-[#414141] dark:text-gray-200">{opt.label}</span>
+                    <span className="text-sm text-ink">{opt.label}</span>
                   </label>
                 ))}
               </div>
             </div>
+
+            <CamposLegales formId="benchmark" aceptado={consent} onAceptar={setConsent} />
 
             {status === 'error' && (
               <p className="text-sm text-red-500 text-center">Ocurrió un error. Intentá nuevamente.</p>
@@ -380,16 +426,12 @@ const DownloadModal = ({ onClose, reduced }) => {
 
             <Button
               type="submit"
-              disabled={status === 'loading'}
-              className="w-full bg-[#3256D7] hover:bg-[#2845b8] text-white rounded-full py-6 text-base font-semibold mt-2 disabled:opacity-60"
+              disabled={status === 'loading' || !consent}
+              className="w-full bg-primary hover:bg-primary-hover text-white rounded-full py-6 text-base font-semibold mt-2 disabled:opacity-60"
             >
               {status === 'loading' ? (
                 <span className="flex items-center gap-2">
-                  <motion.span
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                    className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
-                  />
+                  <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin motion-reduce:animate-none" />
                   Enviando…
                 </span>
               ) : (
@@ -400,13 +442,13 @@ const DownloadModal = ({ onClose, reduced }) => {
               )}
             </Button>
 
-            <p className="text-xs text-gray-400 dark:text-gray-600 text-center">
-              Tus datos no se comparten con terceros.
+            <p className="text-xs text-ink-subtle text-center">
+              Sin spam. Te mandamos el informe y nada más.
             </p>
           </form>
         )}
-      </motion.div>
-    </motion.div>
+      </DialogContent>
+    </Dialog>
   );
 };
 
@@ -415,6 +457,7 @@ const DownloadModal = ({ onClose, reduced }) => {
 const InmobiliariasLanding = () => {
   const reduced = useReducedMotion();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const disparadorRef = useRef(null);
 
   const skylineRef = useRef(null);
   const skylineInView = useInView(skylineRef, { once: true, amount: 0.3 });
@@ -422,7 +465,7 @@ const InmobiliariasLanding = () => {
   return (
     <>
       {/* ── Hero ─────────────────────────────────────────────────── */}
-      <section ref={skylineRef} className="relative pt-28 pb-0 px-6 md:px-10 bg-white dark:bg-[#0c0c0c] overflow-hidden">
+      <Section ref={skylineRef} variant="default" padding={false} className="relative pt-28 pb-0 px-6 md:px-10 overflow-hidden">
         {/* Skyline de fondo */}
         <div className="absolute inset-x-0 bottom-0 pointer-events-none">
           <SkylineSVG isInView={skylineInView} reduced={reduced} />
@@ -434,7 +477,7 @@ const InmobiliariasLanding = () => {
             initial={reduced ? false : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: EASE }}
-            className="text-sm font-semibold uppercase tracking-widest text-[#3256D7] mb-5 text-center"
+            className="text-sm font-semibold uppercase tracking-widest text-brand mb-5 text-center"
           >
             Posicionarte para Inmobiliarias
           </motion.p>
@@ -443,17 +486,17 @@ const InmobiliariasLanding = () => {
             initial={reduced ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: EASE, delay: 0.1 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#414141] dark:text-white tracking-tight leading-tight mb-4 text-center"
+            className="text-4xl md:text-5xl lg:text-6xl font-bold text-ink tracking-tight leading-tight mb-4 text-center"
           >
             Descargá gratis el<br />
-            <span className="text-[#3256D7]">Benchmark Inmobiliario</span>
+            <span className="text-brand">Benchmark Inmobiliario</span>
           </motion.h1>
 
           <motion.p
             initial={reduced ? false : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: EASE, delay: 0.2 }}
-            className="text-lg text-gray-500 dark:text-gray-400 max-w-xl mx-auto mb-12 leading-relaxed font-light text-center"
+            className="text-lg text-ink-muted max-w-xl mx-auto mb-12 leading-relaxed font-light text-center"
           >
             Estrategias digitales que están funcionando ahora.
           </motion.p>
@@ -476,13 +519,21 @@ const InmobiliariasLanding = () => {
               transition={{ duration: 0.55, ease: EASE, delay: 0.5 }}
               className="flex flex-col items-center gap-6 text-center"
             >
+              {/* Rojo #D0331F, el mismo valor que --destructive. El #E03E2D que
+                  estaba antes daba 4,29:1 con blanco a 18px/700 y el mínimo es
+                  4,5:1; este da 5,03:1 y al lado se ve casi igual. El rojo se
+                  mantiene a propósito: es la señal de "esto es un PDF". */}
               <motion.button
-                onClick={() => setIsModalOpen(true)}
+                ref={disparadorRef}
+                onClick={() => {
+                  track(EVENTS.CTA_CLICK, { cta_text: 'Descargar benchmark', cta_location: 'inmobiliarias-hero' });
+                  setIsModalOpen(true);
+                }}
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                className="group flex items-center gap-4 bg-[#E03E2D] hover:bg-[#c73527] text-white rounded-2xl px-8 py-5 shadow-lg shadow-red-500/25 hover:shadow-red-500/40 transition-shadow"
-                aria-label="Descargar Benchmark Inmobiliario PDF"
+                className="group flex items-center gap-4 bg-[#D0331F] hover:bg-[#B02A19] text-white rounded-2xl px-8 py-5 shadow-lg shadow-red-500/25 hover:shadow-red-500/40 transition-shadow"
+                aria-label={`Descargar ${BENCHMARK.tituloCompleto} en PDF`}
               >
                 <div className="relative flex-shrink-0">
                   <div className="w-11 h-14 bg-white/15 rounded-lg flex flex-col items-center justify-end pb-2 gap-1">
@@ -490,30 +541,30 @@ const InmobiliariasLanding = () => {
                     <div className="w-6 h-0.5 bg-white/60 rounded-full" />
                     <div className="w-4 h-0.5 bg-white/60 rounded-full" />
                   </div>
-                  <div className="absolute -bottom-1 -right-1 bg-white text-[#E03E2D] text-[9px] font-black px-1.5 py-0.5 rounded leading-none">
+                  <div className="absolute -bottom-1 -right-1 bg-white text-[#D0331F] text-[11px] font-black px-1.5 py-0.5 rounded leading-none">
                     PDF
                   </div>
                 </div>
                 <div className="text-left">
-                  <p className="text-white/70 text-xs font-medium uppercase tracking-wider mb-0.5">Descarga gratuita</p>
-                  <p className="text-white text-lg font-bold leading-tight">Benchmark Inmobiliario</p>
-                  <p className="text-white/70 text-sm">Argentina 2025</p>
+                  {/* Los subtextos estaban en white/70 (2,79:1). La jerarquía la
+                      dan el tamaño y el peso, no la opacidad: en blanco pleno
+                      sobre este rojo dan 5,03:1 y se siguen leyendo como
+                      secundarios. */}
+                  <p className="text-white text-xs font-medium uppercase tracking-wider mb-0.5">Descarga gratuita</p>
+                  <p className="text-white text-lg font-bold leading-tight">{BENCHMARK.titulo}</p>
+                  <p className="text-white text-sm font-light">{BENCHMARK.mercado}</p>
                 </div>
                 <Download size={20} className="ml-2 opacity-80 group-hover:translate-y-0.5 transition-transform" />
               </motion.button>
 
-              <p className="text-sm text-gray-400 dark:text-gray-600">Sin spam. Solo el informe.</p>
+              <p className="text-sm text-ink-subtle">Sin spam. Solo el informe.</p>
             </motion.div>
           </div>
         </div>
-      </section>
+      </Section>
 
       {/* ── Modal ─────────────────────────────────────────────────── */}
-      <AnimatePresence>
-        {isModalOpen && (
-          <DownloadModal onClose={() => setIsModalOpen(false)} reduced={reduced} />
-        )}
-      </AnimatePresence>
+      <DownloadModal abierto={isModalOpen} onAbrir={setIsModalOpen} disparadorRef={disparadorRef} />
     </>
   );
 };

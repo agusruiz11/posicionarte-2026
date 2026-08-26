@@ -1,0 +1,39 @@
+# Posicionarte Online
+
+> Agencia de marketing digital argentina. Construye el sistema digital completo de un negocio —web, publicidad paga, SEO, contenido, IA y automatización— sin paquetes cerrados: cada cliente recibe la combinación de servicios que su situación necesita.
+
+Trabaja con pymes consolidadas de Argentina en rubros como inmobiliarias, e-commerce, construcción, salud y estética, educación, deportes y eventos.
+
+## Qué hace
+
+- **Google Ads** — captar demanda que ya existe.
+- **Meta Ads** — generar demanda y reconocimiento en Facebook e Instagram.
+- **SEO / AEO** — visibilidad orgánica, incluyendo buscadores y asistentes con IA.
+- **Diseño Web** — sitios rápidos, medibles y orientados a conversión (React/Next.js, WordPress, TiendaNube).
+- **Social Media & Content** — presencia consistente con criterio.
+- **Estrategia Digital** — el plan antes que las herramientas.
+- **IA y automatización** — chatbots de WhatsApp que califican leads, agentes que procesan información, automatizaciones entre herramientas.
+
+## Cómo trabaja
+
+Metodología de cinco pasos: Análisis → Estrategia → Ejecución → Optimización → Reportes.
+
+Tres modalidades: gestión mensual continua, soluciones puntuales, y consultoría uno a uno.
+
+## Páginas
+
+- [Inicio](https://posicionarte.online/): propuesta de valor, servicios, metodología y clientes.
+- [Servicios](https://posicionarte.online/servicios): detalle de los seis servicios.
+- [Casos](https://posicionarte.online/casos): clientes y proyectos, filtrables por servicio.
+- [Inmobiliarias](https://posicionarte.online/inmobiliarias): vertical inmobiliaria y descarga del Benchmark Inmobiliario Argentina 2026.
+- [Contacto](https://posicionarte.online/contacto): formulario y WhatsApp.
+- [Privacidad](https://posicionarte.online/privacidad): tratamiento de datos personales.
+- [Términos](https://posicionarte.online/terminos): condiciones de uso.
+
+## Contacto
+
+WhatsApp +54 9 11 7236-0193 · Instagram @posicionarte.online · https://posicionarte.online
+
+## Notas
+
+Posicionarte no publica métricas de clientes sin autorización escrita ni testimonios que no sean verificables. Cualquier cifra atribuida a la agencia que no aparezca en su sitio no proviene de ella.

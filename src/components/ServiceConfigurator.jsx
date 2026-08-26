@@ -7,6 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp, Users, Sparkles, Target, Mail, Award } from 'lucide-react';
 import { useReducedMotion } from '@/lib/use-reduced-motion';
 import { cn } from '@/lib/utils';
+import { EVENTS, track } from '@/lib/analytics';
+import Section from '@/components/Section';
 
 const objectives = [
   {
@@ -89,15 +91,15 @@ function Card({ title, description, icon: Icon, index }) {
         delay: index * 0.06,
       }}
       className={cn(
-        'rounded-2xl border border-[#D9D9D9]/80 dark:border-white/10 bg-white dark:bg-[#1a1a1a] p-6 md:p-8 text-left',
-        'hover:border-[#3256D7]/30 dark:hover:border-[#3256D7]/40 transition-colors duration-200'
+        'rounded-2xl border border-[#D9D9D9]/80 dark:border-white/10 bg-surface-2 p-6 md:p-8 text-left',
+        'hover:border-brand/30 dark:hover:border-brand/40 transition-colors duration-200'
       )}
     >
-      <div className="w-12 h-12 rounded-xl bg-[#3256D7]/10 flex items-center justify-center mb-5">
-        <Icon className="text-[#3256D7]" size={24} />
+      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
+        <Icon className="text-brand" size={24} />
       </div>
-      <h3 className="text-xl font-bold text-[#414141] dark:text-white mb-2">{title}</h3>
-      <p className="text-gray-500 dark:text-gray-400 leading-relaxed">{description}</p>
+      <h3 className="text-xl font-bold text-ink mb-2">{title}</h3>
+      <p className="text-ink-muted leading-relaxed">{description}</p>
     </motion.div>
   );
 }
@@ -108,18 +110,25 @@ export default function ServiceConfigurator() {
   const current = objectives.find((o) => o.id === value) ?? objectives[0];
 
   return (
-    <section id="configurador" className="section-padding bg-gray-50/50 dark:bg-[#0c0c0c]" aria-labelledby="configurador-heading">
+    <Section id="configurador" variant="alt" aria-labelledby="configurador-heading">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-12">
-          <h2 id="configurador-heading" className="text-4xl md:text-6xl font-bold text-[#414141] dark:text-white mb-6 tracking-tight">
-            Elegí tu <span className="text-[#3256D7]">objetivo</span>.
+          <h2 id="configurador-heading" className="text-4xl md:text-6xl font-bold text-ink mb-6 tracking-tight">
+            Elegí tu <span className="text-brand">objetivo</span>.
           </h2>
-          <p className="text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-ink-muted max-w-2xl mx-auto">
             Tres enfoques. Misma calidad. Contenido que se adapta a lo que necesitás.
           </p>
         </div>
 
-        <Tabs.Root value={value} onValueChange={setValue} className="w-full">
+        <Tabs.Root
+          value={value}
+          onValueChange={(v) => {
+            setValue(v);
+            track(EVENTS.SELECT_OBJECTIVE, { objective: v });
+          }}
+          className="w-full"
+        >
           <Tabs.List
             className="flex flex-wrap justify-center gap-2 p-1.5 rounded-2xl bg-white/80 dark:bg-white/5 border border-[#D9D9D9]/60 dark:border-white/10 mb-12"
             aria-label="Objetivo de marketing"
@@ -130,9 +139,9 @@ export default function ServiceConfigurator() {
                 value={obj.id}
                 className={cn(
                   'flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold transition-all duration-200',
-                  'data-[state=inactive]:text-[#414141] dark:data-[state=inactive]:text-gray-300 data-[state=inactive]:hover:bg-gray-100 dark:data-[state=inactive]:hover:bg-white/10',
-                  'data-[state=active]:bg-[#3256D7] data-[state=active]:text-white',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3256D7] focus-visible:ring-offset-2'
+                  'data-[state=inactive]:text-ink data-[state=inactive]:hover:bg-ink/10',
+                  'data-[state=active]:bg-primary data-[state=active]:text-white',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
                 )}
               >
                 <obj.icon size={18} />
@@ -165,6 +174,6 @@ export default function ServiceConfigurator() {
           </Tabs.Content>
         </Tabs.Root>
       </div>
-    </section>
+    </Section>
   );
 }

@@ -2,8 +2,154 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+  Tokens de diseño
+  ────────────────
+  `tailwind.config.js` mapea los colores del sistema a `hsl(var(--token))`.
+  Hasta ahora ninguna hoja definía esas variables, así que toda clase basada en
+  tokens (`bg-primary`, `bg-background`, `ring-ring`, `rounded-md`, `border-input`…)
+  resolvía a un valor inválido. Efectos concretos que esto arregla:
+
+    · ningún <Button> mostraba anillo de foco (ring-ring + ring-offset-background)
+    · el toast de confirmación se dibujaba transparente (bg-background)
+    · el toast de error se dibujaba transparente (bg-destructive)
+    · rounded-md / rounded-lg no aplicaban radio (var(--radius))
+
+  Los valores salen de docs/BRAND-CONTENT-KIT.md. Formato: canales HSL sueltos,
+  sin envolver en hsl(), como exige Tailwind para poder aplicar opacidad
+  (`bg-primary/90`).
+
+  Contrastes verificados (WCAG 2.1):
+    blanco sobre --primary      6,09:1
+    blanco sobre --destructive  5,03:1
+    --foreground sobre --background        10,21:1
+    --muted-foreground sobre --background   6,13:1 (claro) / 8,10:1 (oscuro)
+    --ring sobre fondo oscuro   6,35:1
+*/
+
+@layer base {
+  :root {
+    /* Superficies */
+    --background: 0 0% 100%;          /* #FFFFFF */
+    --foreground: 0 0% 25%;           /* #414141 — texto principal del kit */
+    --card: 0 0% 100%;                /* #FFFFFF */
+    --card-foreground: 0 0% 25%;      /* #414141 */
+    --popover: 0 0% 100%;             /* #FFFFFF */
+    --popover-foreground: 0 0% 25%;   /* #414141 */
+
+    /* Marca */
+    --primary: 227 67% 52%;           /* #3256D7 — azul de marca */
+    --primary-hover: 228 64% 44%;     /* #2845B8 */
+    --primary-foreground: 0 0% 100%;  /* #FFFFFF */
+
+    /* Neutros de apoyo */
+    --secondary: 220 14% 96%;         /* #F3F4F6 */
+    --secondary-foreground: 0 0% 25%; /* #414141 */
+    --muted: 0 0% 97%;                /* #F8F8F8 */
+    --muted-foreground: 220 10% 40%;  /* #5B6270 — 6,13:1 sobre blanco */
+    --accent: 220 14% 96%;            /* #F3F4F6 — fondo de hover */
+    --accent-foreground: 227 67% 52%; /* #3256D7 */
+
+    /* Error. El kit define #E03E2D como color de alerta, pero con blanco encima
+       da 4,29:1 y no pasa AA. Como FONDO usamos una variante más oscura
+       (#D0331F, 5,03:1). #E03E2D sigue valiendo para texto y bordes sobre claro. */
+    --destructive: 7 74% 47%;         /* #D0331F */
+    --destructive-foreground: 0 0% 100%;
+
+    /* Bordes, campos y foco */
+    --border: 220 13% 91%;            /* #E5E7EB */
+    --input: 220 13% 91%;             /* #E5E7EB */
+    --ring: 227 67% 52%;              /* #3256D7 */
+
+    --radius: 0.75rem;
+
+    /* ── Tokens semánticos ──────────────────────────────────────────────
+       Los de arriba existen porque shadcn los pide. Estos son los que usan
+       nuestros componentes, y son los que hacen que el modo oscuro funcione
+       solo: se declara la intención (texto secundario, superficie alterna)
+       en vez del color, y cada tema resuelve el valor.
+
+       Se exponen en tailwind.config.js como bg-surface-0/1/2, text-ink,
+       text-ink-muted, text-ink-subtle, text-brand, bg-brand, border-hairline. */
+
+    --surface-0: 0 0% 100%;           /* #FFFFFF — fondo de página */
+    --surface-1: 0 0% 97%;            /* #F8F8F8 — sección alterna */
+    --surface-2: 0 0% 100%;           /* #FFFFFF — tarjeta sobre superficie */
+
+    --text-1: 0 0% 25%;               /* #414141 — 10,21:1 */
+    --text-2: 220 10% 40%;            /* #5B6270 — 6,13:1 (reemplaza text-gray-500) */
+    --text-3: 220 9% 46%;             /* #6B7280 — 4,83:1 (metadatos) */
+
+    --brand: 227 67% 52%;             /* #3256D7 — 6,09:1 */
+    --brand-hover: 228 64% 44%;       /* #2845B8 — 7,97:1 */
+
+    --hairline: 220 13% 91%;          /* #E5E7EB — separadores */
+  }
+
+  .dark {
+    /* Superficies — fondo #0C0C0C y superficies #111111 / #1A1A1A del kit */
+    --background: 0 0% 5%;            /* #0C0C0C */
+    --foreground: 0 0% 100%;          /* #FFFFFF */
+    --card: 0 0% 7%;                  /* #111111 */
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 10%;              /* #1A1A1A */
+    --popover-foreground: 0 0% 100%;
+
+    /* Marca — el relleno mantiene el azul (blanco encima da 6,09:1) */
+    --primary: 227 67% 52%;           /* #3256D7 — mismo valor en los dos temas:
+                                         es un RELLENO, y con blanco encima da
+                                         6,09:1. El token de texto (--brand) sí
+                                         se aclara en oscuro. */
+    --primary-hover: 228 64% 44%;     /* #2845B8 */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 10%;            /* #1A1A1A */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 7%;                 /* #111111 */
+    --muted-foreground: 220 11% 67%;  /* #A1A7B3 — 8,10:1 sobre #0C0C0C */
+    --accent: 0 0% 12%;               /* #1E1E1E */
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 7 74% 47%;         /* #D0331F */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 12%;               /* #1E1E1E */
+    --input: 0 0% 18%;                /* #2E2E2E — más claro que el borde para
+                                         que los campos se distingan del fondo */
+    --ring: 228 100% 72%;             /* #6F8BFF — azul claro del kit, 6,35:1
+                                         sobre #0C0C0C. El #3256D7 sobre oscuro
+                                         da 3,21:1 y no sirve como indicador. */
+
+    /* ── Tokens semánticos (oscuro) ─────────────────────────────────────
+       Antes había siete grises oscuros distintos repartidos por los
+       componentes (#0C0C0C, #111111, #141414, #1A1A1A, #1E1E1E, #080808,
+       #000212). Acá quedan tres superficies y tres niveles de texto. */
+
+    --surface-0: 0 0% 5%;             /* #0C0C0C */
+    --surface-1: 0 0% 7%;             /* #111111 */
+    --surface-2: 0 0% 10%;            /* #1A1A1A */
+
+    --text-1: 0 0% 100%;              /* #FFFFFF — 19,56:1 */
+    --text-2: 220 11% 67%;            /* #A1A7B3 — 8,10:1 */
+    --text-3: 220 8% 58%;             /* #8A909C — 6,10:1 */
+
+    --brand: 228 100% 72%;            /* #6F8BFF — 6,35:1. El azul de marca
+                                         sobre oscuro da 3,21:1 y no pasa AA. */
+    --brand-hover: 229 100% 77%;      /* #8CA1FF — 8,06:1 */
+
+    --hairline: 0 0% 12%;             /* #1E1E1E */
+  }
+
+  /* Red de seguridad: si un elemento interactivo queda sin anillo propio,
+     igual muestra foco visible al navegar por teclado. */
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+}
+
 body {
-  @apply bg-white text-[#414141] dark:bg-[#0c0c0c] dark:text-white;
+  @apply bg-surface-0 text-ink;
   font-family: var(--font-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

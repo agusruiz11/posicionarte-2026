@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ExternalLink } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { EASE } from '@/lib/motion';
+import { useReducedMotion } from '@/lib/use-reduced-motion';
 
 // ─── Cards Logos ────────────────────────────────────────────────────────────────────
 import coaLogo       from '@/assets/images/clients/logos/COAlogo.png';
@@ -25,13 +26,11 @@ import sustainLogo   from '@/assets/images/clients/logos/sustainProtocol.png';
 import vesLogoCardLight   from '@/assets/images/clients/logoCards/light/VESwhite.jpg';
 import tessioLogoLight    from '@/assets/images/clients/logoCards/light/tessioYvuotto2.png';
 import cabanasLogoLight   from '@/assets/images/clients/logoCards/light/cabanias-negro-transparente.png';
-import INBlight           from '@/assets/images/clients/logoCards/light/INBazul.png';
 import queensLogoLight    from '@/assets/images/clients/logoCards/light/3.png';
 // ─── Darks ────────────────────────────────────────────────────────────────────────────────
 import vesLogoCardDark    from '@/assets/images/clients/logoCards/dark/VESblack.jpg';
 import tessioLogoDark     from '@/assets/images/clients/logoCards/dark/tessioYvuotto1.png';
 import cabanasLogo        from '@/assets/images/clients/logos/cabanias-blancoyverde.png';
-import INBdark           from '@/assets/images/clients/logoCards/dark/INBblanco.png';
 import queensLogoDark    from '@/assets/images/clients/logoCards/dark/2.png';
 
 // ─── Carrousell Logos  ────────────────────────────────────────────────────────────────────
@@ -45,6 +44,9 @@ import queensLogoCar from '@/assets/images/clients/logoCarrousel/5.png'
 // ─── Darks ────────────────────────────────────────────────────────────────────────────────
 import lizzeCarDarkLogo  from '@/assets/images/clients/logoCarrousel/lizzeLogo.png'
 import luagroCarLogoLight from '@/assets/images/clients/logoCarrousel/luagro-transparente-red.png'
+import Section from '@/components/Section';
+import { EVENTS, track } from '@/lib/analytics';
+import Image from 'next/image';
 // ─── Constantes ───────────────────────────────────────────────────────────────
 const TECH_COLORS = {
   React:      '#61dafb',
@@ -299,19 +301,13 @@ const clients = [
     tech: 'React',
     services: ['web'],
     links: [{ label: 'Ver sitio', url: 'https://sustaintoken.org/' }],
-    logo: sustainLogo, // uncomment import arriba también
+    logo: sustainLogo,
   },
-  // {
-  //   id: 16,
-  //   name: 'INB Seguros',
-  //   initials: 'IN',
-  //   tipo: 'Seguros',
-  //   tech: null,
-  //   services: ['google-ads', 'meta-ads', 'instagram'],
-  //   links: [{ label: 'Ver Instagram', url: 'https://www.instagram.com/inbseguros/' }],
-  //   logoLight: INBlight,
-  //   logoDark: INBdark,
-  // },
+  // Pendiente de reincorporar: INB Seguros (Google Ads + Meta Ads + Instagram,
+  // https://www.instagram.com/inbseguros/). Los imports de sus logos se quitaron
+  // porque webpack los incluía en el build aunque la entrada estuviera comentada:
+  // eran 96 KB que viajaban a cada visitante sin renderizarse nunca. Los archivos
+  // siguen en src/assets/images/clients/logoCards/{light/INBazul.png,dark/INBblanco.png}.
 ];
 
 // ─── Stats ────────────────────────────────────────────────────────────────────
@@ -355,7 +351,7 @@ function ClientCard({ client, isDark }) {
         boxShadow: hovered ? `0 0 40px ${color}28` : 'none',
         transition: 'min-height 0.22s cubic-bezier(0.22,1,0.36,1), border-color 0.3s ease, box-shadow 0.3s ease',
       }}
-      className="relative rounded-2xl border bg-white dark:bg-[#111111] overflow-hidden cursor-pointer"
+      className="relative rounded-2xl border bg-surface-2 overflow-hidden cursor-pointer"
     >
       {/* Overlay hover */}
       <AnimatePresence>
@@ -369,7 +365,7 @@ function ClientCard({ client, isDark }) {
             className="absolute inset-0 flex flex-col items-center justify-center gap-2.5 px-5 py-6 z-10"
             style={{ background: `linear-gradient(135deg, ${color}1a 0%, ${overlayBg} 65%)` }}
           >
-            <span className="text-base font-bold text-[#111111] dark:text-white tracking-tight text-center">
+            <span className="text-base font-bold text-ink tracking-tight text-center">
               {client.name}
             </span>
             {client.links.map((link) => (
@@ -378,7 +374,14 @@ function ClientCard({ client, isDark }) {
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  track(EVENTS.CLICK_CASE_STUDY, {
+                    client_name: client.name,
+                    rubro: client.tipo,
+                    servicio: client.services[0],
+                  });
+                }}
                 className="flex items-center gap-2 text-sm font-semibold px-5 py-2 rounded-full hover:opacity-90 transition-opacity w-full justify-center"
                 style={{ background: color, color: '#fff' }}
               >
@@ -397,8 +400,8 @@ function ClientCard({ client, isDark }) {
       >
         <div className="flex-1 flex flex-col justify-between min-w-0 p-5">
           <div>
-            <h3 className="text-[#111111] dark:text-white font-bold text-base mb-0.5 leading-snug">{client.name}</h3>
-            <p className="text-gray-500 text-xs mb-3">{client.tipo}</p>
+            <h3 className="text-ink font-bold text-base mb-0.5 leading-snug">{client.name}</h3>
+            <p className="text-ink-muted text-xs mb-3">{client.tipo}</p>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {client.tech && (
@@ -419,14 +422,12 @@ function ClientCard({ client, isDark }) {
         </div>
 
         <div
-          className="w-28 shrink-0 flex items-center justify-center overflow-hidden"
+          className="relative w-28 shrink-0 overflow-hidden"
           style={{ background: logoBg }}
         >
-          <img
-            src={logo.src}
-            alt={client.name}
-            className="w-full h-full object-contain"
-          />
+          {/* alt vacío a propósito: el nombre del cliente ya está en el h3 de
+              al lado y un lector de pantalla no tiene que oírlo dos veces. */}
+          <Image src={logo} alt="" fill sizes="112px" className="object-contain" />
         </div>
       </div>
     </div>
@@ -434,20 +435,23 @@ function ClientCard({ client, isDark }) {
 }
 
 // ─── Filter bar ───────────────────────────────────────────────────────────────
-function FilterBar({ active, onChange, isDark }) {
+// Los colores salían de estilos inline con hex fijos según `isDark`: el estado
+// inactivo daba 3,60:1 en oscuro y 4,39:1 en claro, por debajo de AA. Ahora usa
+// los tokens del tema, y el estado activo se anuncia con aria-pressed en vez de
+// comunicarse solo por color.
+function FilterBar({ active, onChange }) {
+  const base = 'text-sm font-semibold px-4 py-2 rounded-full transition-colors duration-200';
   return (
     <div className="flex flex-wrap gap-2 mb-10">
       {FILTERS.map((f) => (
         <button
           key={f.id}
           onClick={() => onChange(f.id)}
-          className="text-sm font-semibold px-4 py-2 rounded-full transition-all duration-200"
-          style={
+          aria-pressed={active === f.id}
+          className={
             active === f.id
-              ? { background: '#3256D7', color: '#fff' }
-              : isDark
-                ? { background: '#1a1a1a', color: '#6b7280', border: '1px solid #1e1e1e' }
-                : { background: '#f3f4f6', color: '#6b7280', border: '1px solid #e5e7eb' }
+              ? `${base} bg-primary text-white`
+              : `${base} bg-surface-2 text-ink-muted border border-hairline hover:text-ink`
           }
         >
           {f.label}
@@ -460,7 +464,11 @@ function FilterBar({ active, onChange, isDark }) {
 // ─── Logo carousel ────────────────────────────────────────────────────────────
 function LogoCarousel({ isDark }) {
   const [paused, setPaused] = useState(false);
-  const items = [...clients, ...clients];
+  const reduced = useReducedMotion();
+  // El track se duplica visualmente con una segunda tira marcada como
+  // aria-hidden. Antes se duplicaba el array, y eso metía 17 <img> extra en el
+  // DOM que el navegador tenía que descargar y pintar dos veces.
+  const items = clients;
   const fadeColor = isDark ? '#080808' : '#f8f8f8';
 
   return (
@@ -474,15 +482,20 @@ function LogoCarousel({ isDark }) {
       <div className="pointer-events-none absolute right-0 top-0 h-full w-24 z-10"
         style={{ background: `linear-gradient(to left, ${fadeColor}, transparent)` }} />
 
+      {/* La animación se decide en JS, no con `motion-reduce:` en la clase: el
+          estilo inline le gana a la utilidad de Tailwind y el marquee seguía
+          girando para quien pide movimiento reducido. */}
       <div
         className="flex gap-4"
         style={{
           width: 'max-content',
-          animation: 'marquee 32s linear infinite',
-          animationPlayState: paused ? 'paused' : 'running',
+          ...(reduced ? {} : {
+            animation: 'marquee 32s linear infinite',
+            animationPlayState: paused ? 'paused' : 'running',
+          }),
         }}
       >
-        {items.map((client, i) => {
+        {[...items, ...items].map((client, i) => {
           const logo = getCarouselLogo(client, isDark);
           return (
             <a
@@ -490,11 +503,14 @@ function LogoCarousel({ isDark }) {
               href={client.links[0].url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex shrink-0 h-32 w-56 overflow-hidden hover:border-[#3256D7]/50 transition-colors duration-300 group"
+              className="flex shrink-0 h-32 w-56 overflow-hidden hover:border-brand/50 transition-colors duration-300 group"
             >
-              <img
-                src={logo.src}
+              <Image
+                src={logo}
                 alt={client.name}
+                width={224}
+                height={128}
+                sizes="224px"
                 className="w-full h-full object-contain p-2 opacity-70 group-hover:opacity-100 transition-opacity duration-300"
               />
             </a>
@@ -519,7 +535,7 @@ export default function CaseStudies() {
     : clients.filter((c) => c.services.includes(activeFilter));
 
   return (
-    <section id="casos" className="section-padding bg-[#f8f8f8] dark:bg-[#080808]">
+    <Section id="casos" variant="alt">
       <div className="max-w-6xl mx-auto">
 
         {/* Header */}
@@ -530,10 +546,10 @@ export default function CaseStudies() {
           transition={{ duration: 0.7, ease: EASE }}
           className="mb-14"
         >
-          <h2 className="text-4xl md:text-6xl font-bold text-[#111111] dark:text-white mb-4 tracking-tight">
+          <h2 className="text-4xl md:text-6xl font-bold text-ink mb-4 tracking-tight">
             Nuestros <span style={{ color: '#3256D7' }}>clientes</span>.
           </h2>
-          <p className="text-gray-500 text-lg max-w-xl">
+          <p className="text-ink-muted text-lg max-w-xl">
             Proyectos reales. Resultados concretos. Tecnología que funciona.
           </p>
         </motion.div>
@@ -544,16 +560,16 @@ export default function CaseStudies() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.6, ease: EASE }}
-          className="grid grid-cols-3 gap-px mb-12 rounded-2xl overflow-hidden border border-gray-200 dark:border-[#1e1e1e]"
+          className="grid grid-cols-3 gap-px mb-12 rounded-2xl overflow-hidden border border-hairline"
         >
           {stats.map((stat, i) => (
             <div
               key={stat.label}
-              className="bg-white dark:bg-[#111111] px-4 py-6 text-center"
+              className="bg-surface-2 px-4 py-6 text-center"
               style={{ borderRight: i < stats.length - 1 ? `1px solid ${isDark ? '#1e1e1e' : '#e5e7eb'}` : 'none' }}
             >
-              <div className="text-3xl md:text-4xl font-bold text-[#111111] dark:text-white mb-1">{stat.value}</div>
-              <div className="text-gray-500 text-xs md:text-sm">{stat.label}</div>
+              <div className="text-3xl md:text-4xl font-bold text-ink mb-1">{stat.value}</div>
+              <div className="text-ink-muted text-xs md:text-sm">{stat.label}</div>
             </div>
           ))}
         </motion.div>
@@ -565,7 +581,7 @@ export default function CaseStudies() {
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.5, ease: EASE }}
         >
-          <FilterBar active={activeFilter} onChange={setActiveFilter} isDark={isDark} />
+          <FilterBar active={activeFilter} onChange={setActiveFilter} />
         </motion.div>
 
         {/* Grid */}
@@ -596,6 +612,6 @@ export default function CaseStudies() {
       {/* Carousel — full width */}
       <LogoCarousel isDark={isDark} />
 
-    </section>
+    </Section>
   );
 }

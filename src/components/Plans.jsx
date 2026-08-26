@@ -2,9 +2,11 @@
 
 
 import React from 'react';
-import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Check, Calendar, Briefcase, Users } from 'lucide-react';
+import { whatsappUrl, trackWhatsApp } from '@/lib/analytics';
+import Section from '@/components/Section';
+import Reveal from '@/components/Reveal';
 
 const Plans = () => {
   const plans = [
@@ -44,68 +46,62 @@ const Plans = () => {
   ];
 
   return (
-    <section className="section-padding bg-white dark:bg-[#111111]">
+    <Section variant="default">
       <div className="max-w-6xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="text-center mb-20"
-        >
-          <h2 className="text-4xl md:text-6xl font-bold text-[#414141] dark:text-white mb-6 tracking-tight">
-            Modalidades de <span className="text-[#3256D7]">Trabajo</span>.
+        <Reveal className="text-center mb-20">
+          <h2 className="text-4xl md:text-6xl font-bold text-ink mb-6 tracking-tight">
+            Modalidades de <span className="text-brand">Trabajo</span>.
           </h2>
-          <p className="text-lg md:text-xl text-gray-500 max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl text-ink-muted max-w-3xl mx-auto">
             Elegí la opción que mejor se adapte a las necesidades y objetivos de tu negocio.
           </p>
-        </motion.div>
+        </Reveal>
 
         <div className="grid md:grid-cols-3 gap-8">
           {plans.map((plan, index) => (
-            <motion.div
+            <Reveal
               key={plan.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.5 }}
-              transition={{ duration: 0.6, delay: index * 0.1, ease: 'easeOut' }}
-              className={`border rounded-3xl p-8 flex flex-col ${
-                plan.highlight ? 'bg-[#414141] dark:bg-[#000212] text-white border-gray-700' : 'bg-gray-50 dark:bg-[#141414] border-gray-200 dark:border-gray-800'
+              delay={index * 90}
+              className={`border rounded-3xl p-8 flex flex-col ${ plan.highlight ? 'bg-[#414141] dark:bg-surface-2 text-white border-white/10' : 'bg-surface-1 border-hairline'
               }`}
             >
               {plan.highlight && (
-                <div className="bg-[#3256D7] text-white text-xs font-semibold px-3 py-1 rounded-full self-start mb-6">
+                <div className="bg-primary text-white text-xs font-semibold px-3 py-1 rounded-full self-start mb-6">
                   MÁS POPULAR
                 </div>
               )}
               <div className="flex-grow">
-                <h3 className="text-3xl font-bold mb-3 dark:text-white">{plan.title}</h3>
-                <p className={`mb-8 ${plan.highlight ? 'text-gray-300' : 'text-gray-500'}`}>{plan.description}</p>
+                <h3 className="text-3xl font-bold mb-3">{plan.title}</h3>
+                <p className={`mb-8 ${plan.highlight ? 'text-gray-300' : 'text-ink-muted'}`}>{plan.description}</p>
                 <ul className="space-y-3 mb-10">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-center gap-3">
-                      <Check className="text-[#3256D7]" size={20} />
+                      <Check className="text-brand" size={20} />
                       <span className="font-medium">{feature}</span>
                     </li>
                   ))}
                 </ul>
               </div>
               <Button asChild
-                className={`w-full rounded-full py-6 text-base font-semibold ${
-                  plan.highlight
-                    ? 'bg-white text-[#414141] hover:bg-gray-200'
-                    : 'bg-[#3256D7] text-white hover:bg-[#2845b8]'
+                className={`w-full rounded-full py-6 text-base font-semibold ${ plan.highlight
+                    ? 'bg-white text-primary hover:bg-white/90'
+                    : 'bg-primary text-white hover:bg-primary-hover'
                 }`}
               >
-                <a href="https://wa.me/5491172360193" target="_blank" rel="noopener noreferrer">
+                <a
+                  href={whatsappUrl(`plan-${plan.title}`, `Hola, me interesa la modalidad ${plan.title}.`)}
+                  onClick={() => trackWhatsApp(`plan-${plan.title}`)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Consultar
                 </a>
               </Button>
-            </motion.div>
+            </Reveal>
           ))}
         </div>
       </div>
-    </section>
+    </Section>
   );
 };
 

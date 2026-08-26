@@ -3,6 +3,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Search, Target, Globe, Palette, MessageSquare, Lightbulb } from 'lucide-react';
+import { EVENTS, track } from '@/lib/analytics';
+import Section from '@/components/Section';
+import Reveal from '@/components/Reveal';
 
 const services = [
   {
@@ -47,33 +50,23 @@ const Services = () => {
   const [activeIndex, setActiveIndex] = useState(null);
 
   const handleServiceClick = (index) => {
-    setActiveIndex(activeIndex === index ? null : index);
+    const abriendo = activeIndex !== index;
+    setActiveIndex(abriendo ? index : null);
+    if (abriendo) track(EVENTS.VIEW_SERVICE, { service_name: services[index].title });
   };
 
   return (
-    <motion.section
-      id="servicios"
-      className="section-padding bg-gray-50 dark:bg-[#111111]"
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.1 }}
-      transition={{ duration: 0.8, ease: 'easeOut' }}
-    >
+    <Section id="servicios" variant="alt">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="max-w-5xl mx-auto mb-16 md:mb-20 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-[#414141] dark:text-white tracking-tight">
-              Soluciones para cada <span className="text-[#3256D7]">objetivo</span>.
+          <Reveal>
+            <h2 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-ink tracking-tight">
+              Soluciones para cada <span className="text-brand">objetivo</span>.
             </h2>
-            <p className="text-lg md:text-xl text-gray-500 max-w-3xl mx-auto font-light leading-relaxed">
+            <p className="text-lg md:text-xl text-ink-muted max-w-3xl mx-auto font-light leading-relaxed">
               Un conjunto de servicios integrales de marketing digital diseñados para impulsar el crecimiento de tu negocio.
             </p>
-          </motion.div>
+          </Reveal>
         </div>
 
         <div className="max-w-4xl mx-auto">
@@ -82,52 +75,45 @@ const Services = () => {
             const isActive = activeIndex === index;
 
             return (
-              <motion.div
+              <Reveal
                 key={service.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="border-b border-gray-200 dark:border-gray-800 last:border-b-0"
+                delay={index * 70}
+                className="border-b border-hairline last:border-b-0"
               >
-                <div
-                  className="flex justify-between items-center cursor-pointer py-8 group gap-4 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3256D7] focus-visible:ring-offset-2"
-                  onClick={() => handleServiceClick(index)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleServiceClick(index);
-                    }
-                  }}
-                  aria-expanded={isActive}
-                  aria-controls={`service-desc-${index}`}
-                  id={`service-trigger-${index}`}
-                >
+                {/* El encabezado va afuera del botón: un h3 adentro de un
+                    <button> rompe la navegación por encabezados del lector de
+                    pantalla. Antes esto era un div con role="button". */}
+                <h3 className="m-0">
+                  <button
+                    type="button"
+                    className="w-full flex justify-between items-center py-8 group gap-4 text-left rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    onClick={() => handleServiceClick(index)}
+                    aria-expanded={isActive}
+                    aria-controls={`service-desc-${index}`}
+                    id={`service-trigger-${index}`}
+                  >
                   <div className="flex items-center gap-4 min-w-0">
-                    <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-[#3256D7] group-hover:border-[#3256D7]/30 transition-colors">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-brand group-hover:border-brand/30 transition-colors">
                       <Icon size={22} strokeWidth={1.75} />
                     </div>
-                    <h3
-                      className={`text-2xl md:text-4xl font-semibold transition-colors duration-300 ${
-                        isActive ? 'text-[#3256D7]' : 'text-[#414141] dark:text-white group-hover:text-[#3256D7]'
+                    <span
+                      className={`text-2xl md:text-4xl font-semibold transition-colors duration-300 ${ isActive ? 'text-brand' : 'text-ink group-hover:text-brand'
                       }`}
                     >
                       {service.title}
-                    </h3>
+                    </span>
                   </div>
 
                   <motion.div
-                    className={`flex-shrink-0 transition-colors ${
-                      isActive ? 'text-[#3256D7]' : 'text-[#414141] group-hover:text-[#3256D7]'
+                    className={`flex-shrink-0 transition-colors ${ isActive ? 'text-brand' : 'text-ink group-hover:text-brand'
                     }`}
                     animate={{ rotate: isActive ? 45 : 0 }}
                     transition={{ duration: 0.3 }}
                   >
                     <Plus size={32} />
                   </motion.div>
-                </div>
+                  </button>
+                </h3>
 
                 <AnimatePresence>
                   {isActive && (
@@ -142,19 +128,19 @@ const Services = () => {
                       className="overflow-hidden"
                     >
                       <div className="pb-8 pl-14 pr-4 md:pl-[4.5rem]">
-                        <p className="text-lg text-gray-500 max-w-2xl leading-relaxed">
+                        <p className="text-lg text-ink-muted max-w-2xl leading-relaxed">
                           {service.description}
                         </p>
                       </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </motion.div>
+              </Reveal>
             );
           })}
         </div>
       </div>
-    </motion.section>
+    </Section>
   );
 };
 

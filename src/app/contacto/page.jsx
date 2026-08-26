@@ -7,7 +7,9 @@ export const metadata = {
   title: 'Contacto',
   description:
     'Contactá a Posicionarte Online. Formulario de contacto y WhatsApp para agendar una reunión y potenciar tu negocio.',
+  alternates: { canonical: '/contacto' },
   openGraph: {
+    url: '/contacto',
     title: 'Contacto | Posicionarte Online',
     description: 'Estamos listos para escuchar sobre tu proyecto. Completá el formulario o escribinos por WhatsApp.',
   },
@@ -15,7 +17,7 @@ export const metadata = {
 
 export default function ContactoPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-surface-0">
       <Navbar />
       <main id="main-content">
         <ContactSection />

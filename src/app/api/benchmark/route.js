@@ -1,6 +1,16 @@
 import { Resend } from 'resend';
+import { BENCHMARK } from '@/data/benchmark';
+import { fila, bloqueAtribucion, pareceBot } from '@/lib/lead-email';
+import { CONTACTO } from '@/data/marca';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Instanciación diferida: si se crea el cliente a nivel de módulo, `next build`
+// lo evalúa durante "Collecting page data" y falla con "Missing API key" en
+// cualquier entorno sin RESEND_API_KEY (clone limpio, CI, preview de rama).
+let resend;
+function getResend() {
+  if (!resend) resend = new Resend(process.env.RESEND_API_KEY);
+  return resend;
+}
 
 const INVERSION_LABELS = {
   si_menos_500: 'Sí, menos de 500 USD',
@@ -19,36 +29,27 @@ export async function POST(request) {
       return Response.json({ error: 'Nombre, inmobiliaria y email son requeridos.' }, { status: 400 });
     }
 
-    await resend.emails.send({
-      from: 'Benchmark Inmobiliario <benchmark@posicionarte.online>',
+    // A los bots se les responde OK para no darles señal de que fallaron, pero
+    // no se manda nada.
+    if (pareceBot(body)) return Response.json({ ok: true });
+
+    await getResend().emails.send({
+      from: `${BENCHMARK.titulo} <benchmark@posicionarte.online>`,
       to: process.env.LEAD_EMAIL.split(',').map((e) => e.trim()),
-      subject: `Nuevo lead benchmark: ${name} — ${company}`,
+      replyTo: String(email).slice(0, 320),
+      subject: `Nuevo lead benchmark: ${String(name).slice(0, 60)} — ${String(company).slice(0, 60)}`,
       html: `
         <h2 style="font-family:sans-serif;color:#3256D7;margin-bottom:16px">
-          Nuevo lead — Benchmark Inmobiliario 2025
+          Nuevo lead — ${BENCHMARK.tituloCompleto}
         </h2>
         <table style="font-family:sans-serif;font-size:14px;border-collapse:collapse;width:100%;max-width:480px">
-          <tr>
-            <td style="padding:10px 12px;font-weight:600;color:#555;background:#f9f9f9;width:40%">Nombre</td>
-            <td style="padding:10px 12px">${name}</td>
-          </tr>
-          <tr>
-            <td style="padding:10px 12px;font-weight:600;color:#555;background:#f9f9f9">Inmobiliaria</td>
-            <td style="padding:10px 12px">${company}</td>
-          </tr>
-          <tr>
-            <td style="padding:10px 12px;font-weight:600;color:#555;background:#f9f9f9">Email</td>
-            <td style="padding:10px 12px"><a href="mailto:${email}">${email}</a></td>
-          </tr>
-          <tr>
-            <td style="padding:10px 12px;font-weight:600;color:#555;background:#f9f9f9">Teléfono</td>
-            <td style="padding:10px 12px">${phone || '—'}</td>
-          </tr>
-          <tr>
-            <td style="padding:10px 12px;font-weight:600;color:#555;background:#f9f9f9">Inversión digital</td>
-            <td style="padding:10px 12px">${INVERSION_LABELS[inversion] || inversion || '—'}</td>
-          </tr>
+          ${fila('Nombre', name)}
+          ${fila('Inmobiliaria', company)}
+          ${fila('Email', email)}
+          ${fila('Teléfono', phone)}
+          ${fila('Inversión digital', INVERSION_LABELS[inversion] || inversion)}
         </table>
+        ${bloqueAtribucion(body)}
         <p style="font-family:sans-serif;font-size:12px;color:#999;margin-top:24px">
           Enviado desde posicionarte.online/inmobiliarias
         </p>
