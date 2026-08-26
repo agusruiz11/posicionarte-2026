@@ -53,8 +53,15 @@
     /* Error. El kit define #E03E2D como color de alerta, pero con blanco encima
        da 4,29:1 y no pasa AA. Como FONDO usamos una variante más oscura
        (#D0331F, 5,03:1). #E03E2D sigue valiendo para texto y bordes sobre claro. */
-    --destructive: 7 74% 47%;         /* #D0331F */
+    --destructive: 7 74% 47%;         /* #D0331F — RELLENO, con texto blanco */
     --destructive-foreground: 0 0% 100%;
+
+    /* Rojo para TEXTO. Va aparte porque las dos cosas no pueden ser el mismo
+       color: un rojo que funciona de relleno con letras blancas encima queda
+       demasiado oscuro para leerse sobre fondo negro. En claro coinciden; en
+       oscuro se separan. Mismo criterio que --brand (texto) contra --primary
+       (relleno). */
+    --destructive-text: 7 74% 47%;    /* #D0331F — 5,03:1 sobre blanco */
 
     /* Bordes, campos y foco */
     --border: 220 13% 91%;            /* #E5E7EB */
@@ -110,8 +117,11 @@
     --accent: 0 0% 12%;               /* #1E1E1E */
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 7 74% 47%;         /* #D0331F */
+    --destructive: 7 74% 47%;         /* #D0331F — sin cambio: sigue siendo
+                                         relleno con texto blanco encima */
     --destructive-foreground: 0 0% 100%;
+    --destructive-text: 6 100% 71%;   /* #FF7A6B — 7,68:1 sobre #0C0C0C,
+                                         6,84:1 sobre #1A1A1A */
 
     --border: 0 0% 12%;               /* #1E1E1E */
     --input: 0 0% 18%;                /* #2E2E2E — más claro que el borde para

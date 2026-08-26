@@ -40,6 +40,9 @@ module.exports = {
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive) / <alpha-value>)',
 					foreground: 'hsl(var(--destructive-foreground) / <alpha-value>)',
+					// `text-destructive-text` para texto rojo, `bg-destructive` para
+					// rellenos. En modo oscuro no son el mismo valor.
+					text: 'hsl(var(--destructive-text) / <alpha-value>)',
 				},
 				muted: {
 					DEFAULT: 'hsl(var(--muted) / <alpha-value>)',

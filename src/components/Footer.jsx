@@ -3,73 +3,17 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/components/ui/use-toast';
 import { motion } from 'framer-motion';
-import { EVENTS, track, trackConversion, whatsappUrl, trackWhatsApp } from '@/lib/analytics';
-import { getAttribution } from '@/lib/attribution';
-import CamposLegales from '@/components/form/CamposLegales';
+import { whatsappUrl, trackWhatsApp } from '@/lib/analytics';
+import LeadForm from '@/components/form/LeadForm';
 import { CONTACTO, UBICACION, REDES } from '@/data/marca';
 import { BENCHMARK } from '@/data/benchmark';
 import logoOnline from '@/assets/logo/logo-online.png';
 import Section from '@/components/Section';
 import Reveal from '@/components/Reveal';
 
-const FORM_ID = 'footer';
-
 const Footer = ({ hideForm = false }) => {
-  // Se dispara una sola vez, en el primer tecleo: mide cuánta gente empieza el
-  // formulario y no lo termina.
-  const empezado = React.useRef(false);
-  const marcarInicio = () => {
-    if (empezado.current) return;
-    empezado.current = true;
-    track(EVENTS.FORM_START, { form_id: FORM_ID });
-  };
-
   const year = new Date().getFullYear();
-  const { toast } = useToast();
-  const [status, setStatus] = React.useState('idle');
-  const [form, setForm] = React.useState({ name: '', email: '', message: '' });
-  const [consent, setConsent] = React.useState(false);
-  // Marca de tiempo de apertura: un envío casi instantáneo es un bot.
-  const abiertoEn = React.useRef(Date.now());
-
-  const set = (key) => (e) => {
-    marcarInicio();
-    setForm((f) => ({ ...f, [key]: e.target.value }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setStatus('loading');
-    try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...form,
-          ...getAttribution(),
-          form_id: FORM_ID,
-          form_elapsed_ms: Date.now() - abiertoEn.current,
-        }),
-      });
-      if (!res.ok) throw new Error();
-      trackConversion(EVENTS.GENERATE_LEAD, { form_id: FORM_ID });
-      setStatus('done');
-      setForm({ name: '', email: '', message: '' });
-      setConsent(false);
-      toast({ title: 'Mensaje enviado', description: 'Te respondemos a la brevedad.' });
-    } catch {
-      setStatus('error');
-      toast({ title: 'Algo salió mal', description: 'Intentá de nuevo o escribinos por WhatsApp.', variant: 'destructive' });
-    } finally {
-      setStatus('idle');
-    }
-  };
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -87,26 +31,12 @@ const Footer = ({ hideForm = false }) => {
               Estamos listos para escuchar sobre tu proyecto y encontrar la mejor manera de ayudarte a crecer. Completá el formulario o escribinos por WhatsApp.
             </p>
           </Reveal>
-          <Reveal as="form" delay={90} onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 gap-6">
-              <div>
-                <Label htmlFor="footer-name" className="text-ink-muted">Nombre</Label>
-                <Input id="footer-name" type="text" placeholder="Tu nombre completo" required value={form.name} onChange={set('name')} className="rounded-2xl" />
-              </div>
-              <div>
-                <Label htmlFor="footer-email" className="text-ink-muted">Email</Label>
-                <Input id="footer-email" type="email" placeholder="ejemplo@email.com" required value={form.email} onChange={set('email')} className="rounded-2xl" />
-              </div>
-              <div>
-                <Label htmlFor="footer-message" className="text-ink-muted">Mensaje</Label>
-                <Textarea id="footer-message" placeholder="Contanos sobre tu proyecto..." required value={form.message} onChange={set('message')} className="rounded-2xl" />
-              </div>
-            </div>
-            <CamposLegales formId="footer" aceptado={consent} onAceptar={setConsent} />
-
-            <Button type="submit" disabled={status === 'loading' || !consent} className="w-full bg-primary hover:bg-primary-hover text-white rounded-full py-6 text-base font-semibold disabled:opacity-60">
-              {status === 'loading' ? 'Enviando…' : 'Enviar mensaje'}
-            </Button>
+          <Reveal delay={90}>
+            <LeadForm
+              formId="footer"
+              tituloExito="Recibimos tu mensaje"
+              textoExito="Te respondemos dentro de las próximas 24 horas hábiles."
+            />
           </Reveal>
         </div>}
 
@@ -162,15 +92,8 @@ const Footer = ({ hideForm = false }) => {
               <li className="text-ink-muted">{UBICACION.visible}</li>
               <li className="text-ink-subtle">Trabajamos 100% online</li>
               <li>
-                {/* Acceso interno del equipo. No es un portal de clientes: el
-                    login del CRM es una allowlist de la tabla User y rechaza
-                    cualquier cuenta que no esté dada de alta. */}
-                <a
-                  href={CONTACTO.crm}
-                  rel="nofollow"
-                  className="text-ink-subtle hover:text-brand transition-colors"
-                >
-                  Acceso equipo
+                <a href={CONTACTO.crm} className="text-ink-muted hover:text-brand transition-colors">
+                  Acceso a clientes
                 </a>
               </li>
             </ul>

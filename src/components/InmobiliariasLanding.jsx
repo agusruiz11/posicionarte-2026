@@ -3,16 +3,12 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/components/ui/use-toast';
 import { useReducedMotion } from '@/lib/use-reduced-motion';
 import { EASE } from '@/lib/motion';
-import { X, Download, CheckCircle, Play, Pause, Volume2, VolumeX } from 'lucide-react';
+import { Download, Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { BENCHMARK } from '@/data/benchmark';
 import { EVENTS, track, trackConversion } from '@/lib/analytics';
-import { getAttribution } from '@/lib/attribution';
-import CamposLegales from '@/components/form/CamposLegales';
+import LeadForm from '@/components/form/LeadForm';
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogClose } from '@/components/ui/dialog';
 import Section from '@/components/Section';
 
@@ -242,44 +238,13 @@ const VideoPlayer = () => {
   );
 };
 
-// ─── Opciones de inversión ────────────────────────────────────────────────────
-
-const INVERSION_OPTIONS = [
-  { value: 'si_menos_500',     label: 'Sí, menos de 500 USD' },
-  { value: 'si_500_1000',      label: 'Sí, entre 500 y 1.000 USD' },
-  { value: 'si_mas_1000',      label: 'Sí, más de 1.000 USD' },
-  { value: 'no',               label: 'No, nada' },
-  { value: 'no_contesta',      label: 'Prefiero no contestar' },
-];
-
 const PDF_PATH     = BENCHMARK.archivo;
 const PDF_FILENAME = BENCHMARK.nombreDescarga;
 
 // ─── Modal de descarga ────────────────────────────────────────────────────────
 
 const DownloadModal = ({ abierto, onAbrir, disparadorRef }) => {
-  const { toast } = useToast();
-  const [status, setStatus] = useState('idle'); // idle | loading | done | error
-  const [form, setForm] = useState({
-    name: '',
-    company: '',
-    email: '',
-    phone: '',
-    inversion: '',
-  });
-  const [consent, setConsent] = useState(false);
-  // Marca de tiempo de apertura: un envío casi instantáneo es un bot.
-  const abiertoEn = useRef(Date.now());
-
-  // Se dispara una sola vez, en el primer tecleo.
-  const empezado = useRef(false);
-  const set = (key) => (e) => {
-    if (!empezado.current) {
-      empezado.current = true;
-      track(EVENTS.FORM_START, { form_id: 'benchmark' });
-    }
-    setForm((f) => ({ ...f, [key]: e.target.value }));
-  };
+  const [descargado, setDescargado] = useState(false);
 
   const triggerDownload = () => {
     const a = document.createElement('a');
@@ -290,45 +255,8 @@ const DownloadModal = ({ abierto, onAbrir, disparadorRef }) => {
     document.body.removeChild(a);
     // Es una conversión: va con atribución para que se pueda importar a Ads.
     trackConversion(EVENTS.FILE_DOWNLOAD, { file_name: BENCHMARK.nombreDescarga });
+    setDescargado(true);
   };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.inversion) {
-      toast({ title: 'Seleccioná una opción', description: 'Indicá si invertís actualmente en posicionamiento.', variant: 'destructive' });
-      return;
-    }
-    setStatus('loading');
-    try {
-      const res = await fetch('/api/benchmark', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...form,
-          ...getAttribution(),
-          form_id: 'benchmark',
-          form_elapsed_ms: Date.now() - abiertoEn.current,
-        }),
-      });
-      if (!res.ok) throw new Error();
-      trackConversion(EVENTS.GENERATE_LEAD, {
-        form_id: 'benchmark',
-        servicio_interes: 'benchmark-inmobiliario',
-        rango_inversion: form.inversion,
-      });
-      triggerDownload();
-      setStatus('done');
-      toast({ title: 'Descarga iniciada', description: 'El benchmark está en tu carpeta de descargas.' });
-    } catch {
-      setStatus('error');
-      toast({ title: 'Algo salió mal', description: 'Intentá de nuevo o escribinos por WhatsApp.', variant: 'destructive' });
-    }
-  };
-
-  // El componente Input ya resuelve fondo, borde y placeholder por token en
-  // los dos temas; acá solo queda el ajuste de forma.
-  const inputClass = 'mt-1 rounded-xl';
-  const labelClass = 'text-ink-muted text-sm';
 
   return (
     <Dialog open={abierto} onOpenChange={onAbrir}>
@@ -339,114 +267,49 @@ const DownloadModal = ({ abierto, onAbrir, disparadorRef }) => {
           disparadorRef?.current?.focus();
         }}
       >
-        <div className="mb-6 pr-8">
-          <p className="text-xs font-semibold uppercase tracking-widest text-brand mb-1">Descarga gratuita</p>
+        {/* Radix exige un DialogTitle siempre presente, si no el diálogo queda
+            sin nombre accesible. Una vez descargado el encabezado cambia en vez
+            de desaparecer: pedirle el formulario a alguien que ya lo completó
+            es confuso. */}
+        <div className={descargado ? 'sr-only' : 'mb-6 pr-8'}>
+          {!descargado && (
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand mb-1">
+              Descarga gratuita
+            </p>
+          )}
           <DialogTitle>
-            Completá el formulario<br />para descargar
+            {descargado ? (
+              'Descarga lista'
+            ) : (
+              <>
+                Completá el formulario<br />para descargar
+              </>
+            )}
           </DialogTitle>
           <DialogDescription className="sr-only">
             Formulario para recibir el {BENCHMARK.tituloCompleto} en PDF.
           </DialogDescription>
         </div>
 
-        {status === 'done' ? (
-          <div className="flex flex-col items-center text-center py-6 gap-4" role="status" aria-live="polite">
-            <CheckCircle size={48} className="text-brand" strokeWidth={1.5} />
-            <p className="text-lg font-semibold text-ink">Tu descarga comenzó</p>
-            <p className="text-ink-muted text-sm">Revisá tu carpeta de descargas.</p>
+        <LeadForm
+          formId="benchmark"
+          onExito={triggerDownload}
+          tituloExito="Tu descarga comenzó"
+          textoExito="El informe está en tu carpeta de descargas."
+        />
+
+        {descargado && (
+          <div className="mt-4 flex flex-col items-center gap-3">
             <button
               onClick={triggerDownload}
-              className="text-brand text-sm font-medium underline underline-offset-2 hover:no-underline transition-all"
+              className="text-brand text-sm font-medium underline underline-offset-2 hover:no-underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               Volver a descargar
             </button>
             <DialogClose asChild>
-              <Button variant="outline" className="rounded-full mt-2">Cerrar</Button>
+              <Button variant="outline" className="rounded-full">Cerrar</Button>
             </DialogClose>
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-
-            {/* Nombre */}
-            <div>
-              <Label htmlFor="f-name" className={labelClass}>Nombre <span className="text-destructive">*</span></Label>
-              <Input id="f-name" type="text" placeholder="Tu nombre completo" required value={form.name} onChange={set('name')} className={inputClass} />
-            </div>
-
-            {/* Inmobiliaria */}
-            <div>
-              <Label htmlFor="f-company" className={labelClass}>Inmobiliaria <span className="text-destructive">*</span></Label>
-              <Input id="f-company" type="text" placeholder="Nombre de tu inmobiliaria" required value={form.company} onChange={set('company')} className={inputClass} />
-            </div>
-
-            {/* Email */}
-            <div>
-              <Label htmlFor="f-email" className={labelClass}>Mail <span className="text-destructive">*</span></Label>
-              <Input id="f-email" type="email" placeholder="ejemplo@inmobiliaria.com" required value={form.email} onChange={set('email')} className={inputClass} />
-            </div>
-
-            {/* Teléfono */}
-            <div>
-              <Label htmlFor="f-phone" className={labelClass}>Teléfono</Label>
-              <Input id="f-phone" type="tel" placeholder="+54 11 0000-0000" value={form.phone} onChange={set('phone')} className={inputClass} />
-            </div>
-
-            {/* Inversión */}
-            <div>
-              <p className={`${labelClass} mb-2`}>
-                ¿Estás invirtiendo actualmente en tu Posicionamiento Digital? <span className="text-destructive">*</span>
-              </p>
-              <div className="space-y-2">
-                {INVERSION_OPTIONS.map((opt) => (
-                  <label
-                    key={opt.value}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl border cursor-pointer transition-all duration-150 ${ form.inversion === opt.value
-                        ? 'border-brand bg-primary/5 dark:bg-primary/10'
-                        : 'border-hairline hover:border-ink/25'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="inversion"
-                      value={opt.value}
-                      checked={form.inversion === opt.value}
-                      onChange={set('inversion')}
-                      className="accent-[#3256D7] w-4 h-4 flex-shrink-0"
-                    />
-                    <span className="text-sm text-ink">{opt.label}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <CamposLegales formId="benchmark" aceptado={consent} onAceptar={setConsent} />
-
-            {status === 'error' && (
-              <p className="text-sm text-red-500 text-center">Ocurrió un error. Intentá nuevamente.</p>
-            )}
-
-            <Button
-              type="submit"
-              disabled={status === 'loading' || !consent}
-              className="w-full bg-primary hover:bg-primary-hover text-white rounded-full py-6 text-base font-semibold mt-2 disabled:opacity-60"
-            >
-              {status === 'loading' ? (
-                <span className="flex items-center gap-2">
-                  <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin motion-reduce:animate-none" />
-                  Enviando…
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  <Download size={18} />
-                  Descargar ahora
-                </span>
-              )}
-            </Button>
-
-            <p className="text-xs text-ink-subtle text-center">
-              Sin spam. Te mandamos el informe y nada más.
-            </p>
-          </form>
         )}
       </DialogContent>
     </Dialog>
