@@ -62,7 +62,7 @@ const Footer = ({ hideForm = false }) => {
       setStatus('done');
       setForm({ name: '', email: '', message: '' });
       setConsent(false);
-      toast({ title: '¡Mensaje enviado!', description: 'Te respondemos a la brevedad.' });
+      toast({ title: 'Mensaje enviado', description: 'Te respondemos a la brevedad.' });
     } catch {
       setStatus('error');
       toast({ title: 'Algo salió mal', description: 'Intentá de nuevo o escribinos por WhatsApp.', variant: 'destructive' });
@@ -162,8 +162,15 @@ const Footer = ({ hideForm = false }) => {
               <li className="text-ink-muted">{UBICACION.visible}</li>
               <li className="text-ink-subtle">Trabajamos 100% online</li>
               <li>
-                <a href={CONTACTO.crm} className="text-ink-muted hover:text-brand transition-colors">
-                  Acceso a clientes
+                {/* Acceso interno del equipo. No es un portal de clientes: el
+                    login del CRM es una allowlist de la tabla User y rechaza
+                    cualquier cuenta que no esté dada de alta. */}
+                <a
+                  href={CONTACTO.crm}
+                  rel="nofollow"
+                  className="text-ink-subtle hover:text-brand transition-colors"
+                >
+                  Acceso equipo
                 </a>
               </li>
             </ul>

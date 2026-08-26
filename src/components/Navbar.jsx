@@ -10,12 +10,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import ThemeToggle from '@/components/ThemeToggle';
 import logo from '@/assets/logo/logo.png';
-import { REDES, CONTACTO } from '@/data/marca';
-
-// URL del CRM (subdominio propio). Funciona una vez configurado el DNS de
-// crm.posicionarte.online en Vercel. Mientras tanto se puede apuntar al
-// deploy directo: https://crm-posicionarte-rouge.vercel.app
-const CRM_URL = CONTACTO.crm;
+import { REDES } from '@/data/marca';
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -93,9 +88,6 @@ const Navbar = () => {
 
               <div className="hidden md:flex items-center gap-3">
                 <ThemeToggle />
-                <Button asChild variant="outline" className="rounded-full px-5 py-2 text-sm font-semibold border-brand text-brand hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white">
-                  <a href={CRM_URL}>Ingresar</a>
-                </Button>
                 <Button asChild className="bg-primary hover:bg-primary-hover text-white rounded-full px-5 py-2 text-sm font-semibold">
                   <Link href="/contacto">Contacto</Link>
                 </Button>
@@ -156,10 +148,7 @@ const Navbar = () => {
                   {link.name}
                 </Link>
               ))}
-              <Button asChild variant="outline" className="w-full rounded-full py-3 mt-6 text-base border-brand text-brand hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white">
-                <a href={CRM_URL} onClick={() => setIsMobileMenuOpen(false)}>Ingresar</a>
-              </Button>
-              <Button asChild className="w-full bg-primary hover:bg-primary-hover text-white rounded-full py-3 text-base">
+              <Button asChild className="w-full bg-primary hover:bg-primary-hover text-white rounded-full py-3 mt-6 text-base">
                 <Link href="/contacto" onClick={() => setIsMobileMenuOpen(false)}>Contacto</Link>
               </Button>
               <motion.a

@@ -288,7 +288,8 @@ const DownloadModal = ({ abierto, onAbrir, disparadorRef }) => {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    track(EVENTS.FILE_DOWNLOAD, { file_name: BENCHMARK.nombreDescarga });
+    // Es una conversión: va con atribución para que se pueda importar a Ads.
+    trackConversion(EVENTS.FILE_DOWNLOAD, { file_name: BENCHMARK.nombreDescarga });
   };
 
   const handleSubmit = async (e) => {
@@ -317,7 +318,7 @@ const DownloadModal = ({ abierto, onAbrir, disparadorRef }) => {
       });
       triggerDownload();
       setStatus('done');
-      toast({ title: '¡Descarga iniciada!', description: 'El benchmark está en tu carpeta de descargas.' });
+      toast({ title: 'Descarga iniciada', description: 'El benchmark está en tu carpeta de descargas.' });
     } catch {
       setStatus('error');
       toast({ title: 'Algo salió mal', description: 'Intentá de nuevo o escribinos por WhatsApp.', variant: 'destructive' });
@@ -351,7 +352,7 @@ const DownloadModal = ({ abierto, onAbrir, disparadorRef }) => {
         {status === 'done' ? (
           <div className="flex flex-col items-center text-center py-6 gap-4" role="status" aria-live="polite">
             <CheckCircle size={48} className="text-brand" strokeWidth={1.5} />
-            <p className="text-lg font-semibold text-ink">¡Tu descarga comenzó!</p>
+            <p className="text-lg font-semibold text-ink">Tu descarga comenzó</p>
             <p className="text-ink-muted text-sm">Revisá tu carpeta de descargas.</p>
             <button
               onClick={triggerDownload}

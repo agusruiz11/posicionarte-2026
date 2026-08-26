@@ -56,7 +56,7 @@ export default function ContactSection() {
       setStatus('done');
       setForm({ name: '', email: '', message: '' });
       setConsent(false);
-      toast({ title: '¡Mensaje enviado!', description: 'Te respondemos a la brevedad.' });
+      toast({ title: 'Mensaje enviado', description: 'Te respondemos a la brevedad.' });
     } catch {
       setStatus('error');
       toast({ title: 'Algo salió mal', description: 'Intentá de nuevo o escribinos por WhatsApp.', variant: 'destructive' });
