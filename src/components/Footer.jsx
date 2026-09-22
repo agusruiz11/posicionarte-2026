@@ -49,7 +49,7 @@ const Footer = ({ hideForm = false }) => {
             <ul className="space-y-2.5 text-sm">
               <li><Link href="/" className="text-ink-muted hover:text-brand transition-colors">Inicio</Link></li>
               <li><Link href="/servicios" className="text-ink-muted hover:text-brand transition-colors">Servicios</Link></li>
-              <li><Link href="/casos" className="text-ink-muted hover:text-brand transition-colors">Casos</Link></li>
+              <li><Link href="/casos" className="text-ink-muted hover:text-brand transition-colors">Marcas</Link></li>
               <li><Link href="/contacto" className="text-ink-muted hover:text-brand transition-colors">Contacto</Link></li>
             </ul>
           </nav>

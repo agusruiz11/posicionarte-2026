@@ -26,9 +26,29 @@ Medido el 21/09/2026 con Lighthouse 13.5, perfil mobile, dos corridas por sitio,
 | [Miguel D'Odorico](https://www.migueldodorico.com/) | no | **45** (rojo) | 64.8 s | 0.01 | 441 ms |
 | [Outflow](https://outflow.com.ar/) | sí | **37** (rojo) | 8.5 s | 0.01 | 1643 ms |
 | [Renoir](https://renoir.ar/) | no | **35** (rojo) | 14.8 s | 0.00 | 1344 ms |
-| [Maxcer](https://maxcer.com.ar/) | sí | **31** (rojo) | 9.6 s | 1.01 | 375 ms |
+| [Maxcer](https://maxcer.com.ar/) | sí | ~~31~~ → **87** | ~~9.6 s~~ → 3.0 s | ~~1.01~~ → 0 | ~~375 ms~~ → 160 ms |
 
 Referencia: la propia posicionarte.online dio 70 a 74 en el mismo entorno antes del arreglo del hero, y 88 a 92 en local después. El arreglo fue sacar la opacidad 0 de la animación de entrada del título y el párrafo, que retrasaba el pintado del texto más grande 2,6 segundos.
+
+## Casos cerrados
+
+### Maxcer, 22 de septiembre de 2026
+
+Medido con PageSpeed Insights (Lighthouse 13.5, Moto G Power emulado, 4G lenta) desde una conexión normal, no desde el contenedor.
+
+| | Antes (agosto) | Después (22 sept) |
+|---|---|---|
+| Score mobile | 31 | **87** |
+| Score desktop | no medido | **97** |
+| LCP mobile | 9,6 s | 3,0 s |
+| CLS mobile | 1,01 | 0 |
+| TBT mobile | 375 ms | 160 ms |
+| Peso descargado | 9,9 MB | 586 KB |
+| Accesibilidad / Buenas prácticas / SEO | | 91 / 96 / 92 |
+
+Qué se tocó: once archivos, ninguna decisión de diseño. Imágenes locales en WebP al tamaño que se muestran, hero sin `lazy` y sin `opacity: 0`, secciones de la home con import estático, fuentes por `<link>`, GTM diferido, config de Vite sin Horizons. Detalle en `OPTIMIZACION-WEB.md`.
+
+Lo que queda y por qué no se tocó: el FCP mobile de 2,7 s es el techo de una SPA que se pinta desde JavaScript; para bajarlo hace falta prerender del HTML del hero, que es otro trabajo. El JS sin usar (131 KiB) es GTM y el gtag duplicado de Ads dentro del contenedor de Maxcer, tarea de pauta, no del sitio.
 
 ## Qué dicen los números
 
