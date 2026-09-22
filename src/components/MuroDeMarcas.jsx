@@ -237,7 +237,7 @@ export default function MuroDeMarcas({ compacto = false }) {
 
   if (compacto) {
     return (
-      <Section variant="alt" padding={false} className="py-16 md:py-20">
+      <Section id="marcas" variant="alt" padding={false} className="py-16 md:py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <Reveal className="text-center mb-10">
             <p className="text-sm font-semibold uppercase tracking-widest text-brand mb-3">Marcas que confían</p>

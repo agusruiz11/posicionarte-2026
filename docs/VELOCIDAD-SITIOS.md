@@ -21,7 +21,7 @@ Medido el 21/09/2026 con Lighthouse 13.5, perfil mobile, dos corridas por sitio,
 | [Take Off English](https://takeoffenglish.ar/) | sí | **58** (naranja) | 7.4 s | 0.00 | 402 ms |
 | [Sanyser](https://sanyser.com.ar/) | sí | **57** (naranja) | 9.1 s | 0.01 | 180 ms |
 | [Sustain](https://sustaintoken.org/) | sí | **55** (naranja) | 7.0 s | 0.00 | 273 ms |
-| [Sello Ambiental COA](https://selloambientalcoa.org.ar/) | sí | **54** (naranja) | 18.3 s | 0.07 | 85 ms |
+| [Sello Ambiental COA](https://selloambientalcoa.org.ar/) | sí | ~~62~~ → **71** | ~~8.9 s~~ → 6.2 s | ~~0.07~~ → 0 | 110 ms |
 | [Estudio Vuotto](https://www.estudiovuotto.com.ar/) | sí | **46** (rojo) | 6.5 s | 0.07 | 565 ms |
 | [Miguel D'Odorico](https://www.migueldodorico.com/) | no | **45** (rojo) | 64.8 s | 0.01 | 441 ms |
 | [Outflow](https://outflow.com.ar/) | sí | **37** (rojo) | 8.5 s | 0.01 | 1643 ms |
@@ -49,6 +49,27 @@ Medido con PageSpeed Insights (Lighthouse 13.5, Moto G Power emulado, 4G lenta) 
 Qué se tocó: once archivos, ninguna decisión de diseño. Imágenes locales en WebP al tamaño que se muestran, hero sin `lazy` y sin `opacity: 0`, secciones de la home con import estático, fuentes por `<link>`, GTM diferido, config de Vite sin Horizons. Detalle en `OPTIMIZACION-WEB.md`.
 
 Lo que queda y por qué no se tocó: el FCP mobile de 2,7 s es el techo de una SPA que se pinta desde JavaScript; para bajarlo hace falta prerender del HTML del hero, que es otro trabajo. El JS sin usar (131 KiB) es GTM y el gtag duplicado de Ads dentro del contenedor de Maxcer, tarea de pauta, no del sitio.
+
+### COA, 22 de septiembre de 2026
+
+WordPress con Elementor y tema comercial, sin tocar código del tema. Medido con PageSpeed Insights desde una conexión normal. El antes es de las 13:29 y el después de las 18:26 del mismo día.
+
+| | Antes | Después |
+|---|---|---|
+| Score mobile | 62 | **71** |
+| Score desktop | 83 | **89** |
+| FCP mobile | 3,8 s | 2,1 s |
+| LCP mobile | 8,9 s | 6,2 s |
+| CLS mobile | 0,074 | 0 |
+| LCP desktop | 2,5 s | 1,8 s |
+| Video del hero | 68 MB (.mov) | 2,3 MB (.mp4) |
+| Logo del header | 540 KB | 65 KB |
+| Hojas de estilo | 59 archivos, 1,9 MB | 1 archivo, 1,2 MB |
+| Scripts | 33 sueltos | 6, diferidos |
+
+Qué se tocó, en orden: video comprimido con poster de respaldo y sin reproducir en móvil; logo a tamaño real; actualización de WordPress y 10 plugins; LiteSpeed Cache con minificado, combinado, JS diferido, lazy load y caché de navegador; iconos inline en Elementor; snippet `coa-css-liviano.php` que saca bootstrap, un scrollbar, ACF y dashicons donde no se usan (620 KB de CSS menos).
+
+Lo que queda: el LCP mobile de 6,2 s es una imagen de fondo declarada en CSS, que el navegador descubre tarde (snippet `coa-preload-hero.php` pendiente de aplicar). El CSS restante (1,2 MB, casi todo del tema Gowilds) solo baja con CSS crítico vía QUIC.cloud o cambiando el tema. Ninguna de las dos es urgente.
 
 ## Qué dicen los números
 
