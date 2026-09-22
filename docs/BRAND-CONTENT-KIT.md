@@ -35,6 +35,19 @@ Fuente de verdad para copy, diseño y contenido social. Todo lo de acá está to
 
 Regla: toda pieza tiene que funcionar en claro y en oscuro. El azul nunca compite con el azul: un solo acento fuerte por pieza.
 
+### Paleta cálida "papel" — solo piezas gráficas
+
+Aprobada el 31/08/2026. Es la única familia cálida de la marca: se usa en piezas de Instagram con fondo papel, **no en el sitio** (no tiene tokens en `globals.css`).
+
+| Uso | Hex | Nota |
+|---|---|---|
+| Fondo papel | `#F5F3EE` | |
+| Línea de margen | `#E1D9CA` | El filete vertical tipo anotador. |
+| Texto secundario | `#8A8175` | |
+| Gris de firma y metadatos | `#A39A8B` | Fecha y wordmark. |
+
+Sobre este fondo el texto principal sigue siendo `#414141` y el acento sigue siendo `#3256D7`. Primera pieza que la usa: `content/instagram/2026-08-despedida-messi/`.
+
 ## 3. Tipografía
 
 - **Plus Jakarta Sans** — cuerpo y UI (`--font-sans`).

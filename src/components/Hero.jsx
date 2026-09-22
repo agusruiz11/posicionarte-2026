@@ -13,20 +13,25 @@ import Section from '@/components/Section';
 const Hero = () => {
   const reduced = useReducedMotion();
 
+  // El título y el párrafo son los candidatos a LCP de la home. Antes entraban
+  // con clip-path y con opacidad 0, así que quedaban invisibles hasta que
+  // hidrataba React y pasaba el delay: 2,6 s de "element render delay" medidos
+  // con Lighthouse, con un FCP de 1,1 s. Google mide cuándo se PINTA el texto
+  // más grande, no cuándo termina la animación. Ahora entran deslizándose,
+  // visibles desde el primer pintado: el movimiento queda, la penalización no.
   const headingVariants = reduced
-    ? { hidden: { opacity: 1 }, visible: { opacity: 1 } }
+    ? { hidden: { y: 0 }, visible: { y: 0 } }
     : {
-        hidden: { clipPath: 'inset(0 0 100% 0)', y: 16 },
-        visible: {
-          clipPath: 'inset(0 0 -10% 0)',
-          y: 0,
-          transition: { duration: 0.7, ease: EASE, delay: 0.3 },
-        },
+        hidden: { y: 24 },
+        visible: { y: 0, transition: { duration: 0.7, ease: EASE, delay: 0.1 } },
       };
 
   const subtitleVariants = reduced
-    ? { hidden: { opacity: 1 }, visible: { opacity: 1 } }
-    : fadeIn(0.85);
+    ? { hidden: { y: 0 }, visible: { y: 0 } }
+    : {
+        hidden: { y: 16 },
+        visible: { y: 0, transition: { duration: 0.6, ease: EASE, delay: 0.3 } },
+      };
 
   const ctaVariants = reduced
     ? { hidden: { opacity: 1, scale: 1 }, visible: { opacity: 1, scale: 1 } }

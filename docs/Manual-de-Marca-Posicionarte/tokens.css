@@ -1,0 +1,155 @@
+/* ============================================================
+   POSICIONARTE — Tokens de marca
+   Actualizado: 10/09/2026
+   Copiar este bloque completo al <style> de cualquier HTML.
+   Referencia larga: README.md · Para Claude: INSTRUCCIONES-CLAUDE.md
+   ============================================================ */
+
+/* Tipografías — pegar en el <head>:
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200..900&family=Plus+Jakarta+Sans:wght@200..800&family=Playfair+Display:wght@400..900&display=swap" rel="stylesheet">
+*/
+
+:root{
+  /* ---------- Tipografías ---------- */
+  --display:   'Montserrat', system-ui, sans-serif;          /* títulos */
+  --body:      'Plus Jakarta Sans', system-ui, sans-serif;   /* todo el texto */
+  --editorial: 'Playfair Display', Georgia, serif;           /* opcional: portadas */
+
+  /* Escala fluida: el cuerpo se adapta solo al ancho de pantalla */
+  --fs: clamp(14px, 1.05vw, 18px);
+
+  /* ---------- Azul: un color, tres roles ---------- */
+  --brand:  #3256D7;                  /* el azul del logo. CTA sobre claro, web, CRM */
+  --accent: #5e78f0;                  /* EL AZUL SOBRE FONDO OSCURO: textos, bordes, acentos */
+  --accent-soft: rgba(94,120,240,.12);/* fondo de acento, chips, hovers */
+  --violet: #7a6cf5;                  /* intermedio del degradado de marca */
+  --cyan:   #00dedf;                  /* cierre del degradado, orbes, segunda serie */
+
+  /* ---------- Superficies (dark, el default de la marca) ---------- */
+  --bg:      #0e0e11;                 /* fondo. Tinte azulado, nunca #000 */
+  --panel:   #16161c;                 /* cards sólidas */
+  --surface: rgba(22,22,28,.72);      /* cards de vidrio — va con backdrop-filter */
+  --line:    #27272f;                 /* divisor sutil */
+  --line2:   #33333d;                 /* divisor visible, bordes de card */
+
+  /* ---------- Texto ---------- */
+  --text:  #f2f2f6;                   /* principal */
+  --muted: #b4b4c8;                   /* secundario, bajadas */
+  --dim:   #848498;                   /* etiquetas, pies, metadatos */
+
+  /* ---------- Semánticos ---------- */
+  --good: #22a34a;                    /* positivo en documento impreso */
+  --good-neon: #41e575;               /* positivo en pantalla / dashboard */
+  --warn: #e0a028;                    /* advertencia, pendiente, prospecto */
+  --crit: #e05252;                    /* crítico, caída, alerta */
+  --neutral: #c8c6c6;                 /* estado neutro, pausado */
+
+  /* ---------- Degradados ---------- */
+  --grad:      linear-gradient(100deg,#5e78f0 0%,#7a6cf5 45%,#00dedf 100%);
+  --grad-cta:  linear-gradient(135deg,#5e78f0 0%,#3256D7 100%);
+  --grad-deep: linear-gradient(135deg,#3256D7 0%,#2845b8 100%);  /* CTA sobre claro */
+
+  /* ---------- Forma y profundidad ---------- */
+  --radius:    .75rem;
+  --radius-lg: 1.25rem;
+  --blur:      blur(10px);
+  --shadow-ambient: 0 20px 40px rgba(0,0,0,.4);
+
+  /* ---------- Escala clara (mails, docs sobre blanco) ---------- */
+  --bg-light:      #ffffff;
+  --panel-light:   #f3f4f6;
+  --line-light:    #e5e7eb;
+  --text-light:    #404040;
+  --muted-light:   #5c6370;
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--body);
+  font-size:var(--fs);
+  font-weight:500;                    /* sobre oscuro el 400 se afina de más */
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+h1,h2,h3{font-family:var(--display);font-weight:800;letter-spacing:-.02em;line-height:1.15;margin:0}
+.editorial{font-family:var(--editorial);font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.label{font-size:.72em;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--dim)}
+.kpi{font-family:var(--body);font-weight:800;letter-spacing:-.03em;color:var(--accent);
+     font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+
+a{color:var(--accent);text-decoration:none}
+a:hover{color:var(--cyan)}
+
+/* ============================================================
+   PANELES
+   ============================================================ */
+.panel{background:var(--panel);border-radius:var(--radius-lg);padding:1.5rem}
+
+/* Vidrio — para topbars, overlays y cards sobre el fondo animado */
+.glass{
+  background:var(--surface);
+  backdrop-filter:var(--blur);
+  -webkit-backdrop-filter:var(--blur);
+  border-radius:var(--radius-lg);
+  padding:1.5rem;
+}
+
+/* Borde de degradado — 1px con el degradado de marca.
+   El truco del mask-composite es lo que lo hace posible en CSS puro. */
+.grad-border{position:relative;border-radius:var(--radius-lg)}
+.grad-border::before{
+  content:'';position:absolute;inset:0;border-radius:inherit;padding:1px;
+  background:var(--grad);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  pointer-events:none;
+}
+
+/* ============================================================
+   COMPONENTES
+   ============================================================ */
+.btn{
+  font-family:var(--body);font-weight:600;font-size:.9em;
+  padding:.7em 1.5em;border:0;border-radius:var(--radius);
+  background:var(--grad-cta);color:#fff;cursor:pointer;
+}
+.btn-ghost{background:var(--accent-soft);color:var(--accent);border:1px solid var(--line2)}
+
+.badge{display:inline-block;font-size:.7em;font-weight:600;letter-spacing:.08em;
+       text-transform:uppercase;padding:.28em .7em;border-radius:999px}
+.badge.ok      {background:rgba(65,229,117,.14);color:var(--good-neon)}
+.badge.pend    {background:rgba(224,160,40,.14); color:var(--warn)}
+.badge.alerta  {background:rgba(224,82,82,.14);  color:var(--crit)}
+.badge.neutro  {background:rgba(200,198,198,.10);color:var(--neutral)}
+.badge.marca   {background:var(--accent-soft);   color:var(--accent)}
+
+.delta-up  {color:var(--good-neon);font-weight:700}
+.delta-down{color:var(--crit);font-weight:700}
+
+/* Regla de acento: barra fina con el degradado, en vez de un borde plano */
+.rule{height:2px;border:0;background:var(--grad);opacity:.8}
+
+/* ============================================================
+   IMPRESIÓN / EXPORT A PDF
+   Los degradados en texto (background-clip:text) dejan un recuadro
+   visible en Edge headless. Para PDF usar <svg><text fill="url(#grad)">.
+   ============================================================ */
+@page{size:A4;margin:0}
+@media print{
+  body{background:var(--bg);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .glass{backdrop-filter:none;background:var(--panel)}   /* el blur no imprime bien */
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}

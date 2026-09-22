@@ -23,7 +23,7 @@ import ServiceConfigurator from '@/components/ServiceConfigurator';
 import Services from '@/components/Services';
 import IASection from '@/components/IASection';
 import Methodology from '@/components/Methodology';
-import CaseStudies from '@/components/CaseStudies';
+import MuroDeMarcas from '@/components/MuroDeMarcas';
 import Plans from '@/components/Plans';
 import CTASection from '@/components/CTASection';
 import Footer from '@/components/Footer';
@@ -40,7 +40,7 @@ export default function HomePage() {
         <Services />
         <IASection />
         <Methodology />
-        <CaseStudies />
+        <MuroDeMarcas compacto />
         <Plans />
         <CTASection />
       </main>
