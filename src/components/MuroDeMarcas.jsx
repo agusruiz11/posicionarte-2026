@@ -104,13 +104,13 @@ function TarjetaMarca({ cliente, index }) {
       {/* La placa: misma altura para todos, el logo se centra adentro. El borde
           fino es para modo claro, donde la tarjeta también es blanca y sin él
           la placa no se distingue. */}
-      <div className="flex items-center justify-center h-32 rounded-2xl bg-white border border-hairline px-6 mb-5">
+      <div className="flex items-center justify-center h-36 rounded-2xl bg-white border border-hairline px-6 mb-5 transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100">
         {logo && (
           <Image
             src={logo}
             alt={`Logo de ${cliente.nombre}`}
             sizes="(min-width: 1024px) 280px, (min-width: 640px) 45vw, 90vw"
-            className="max-h-20 w-auto object-contain"
+            className="max-h-24 max-w-[200px] w-auto h-auto object-contain"
           />
         )}
       </div>
@@ -186,7 +186,7 @@ export function BandaDeMarcas() {
 
   return (
     <div
-      className="relative overflow-hidden"
+      className="relative overflow-hidden py-4"
       onMouseEnter={() => setPausado(true)}
       onMouseLeave={() => setPausado(false)}
     >
@@ -204,10 +204,18 @@ export function BandaDeMarcas() {
       >
         {[0, 1].map((copia) => (
           <ul key={copia} className="flex gap-4" aria-hidden={copia === 1 || undefined}>
+            {/* Los logos cuadrados (El Recreo, Cabañas, Fútbol Queens, COA,
+                Makena, VES) quedaban chicos con un tope de 48 px de alto en
+                una tarjeta de 96. La tarjeta ahora es más alta y el logo puede
+                usar 80 px; los apaisados los frena el ancho, así ninguno se
+                come la tarjeta. El hover agranda la tarjeta entera. */}
             {items.map((c) => (
-              <li key={`${c.slug}-${copia}`} className="flex items-center justify-center h-24 w-44 shrink-0 rounded-2xl bg-white px-5">
+              <li
+                key={`${c.slug}-${copia}`}
+                className="group flex items-center justify-center h-28 w-48 shrink-0 rounded-2xl bg-white border border-hairline px-5 transition-[transform,box-shadow] duration-300 hover:scale-[1.06] hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/50 motion-reduce:transition-none motion-reduce:hover:scale-100"
+              >
                 {LOGOS[c.slug] && (
-                  <Image src={LOGOS[c.slug]} alt={copia === 0 ? c.nombre : ''} sizes="176px" className="max-h-12 w-auto object-contain" />
+                  <Image src={LOGOS[c.slug]} alt={copia === 0 ? c.nombre : ''} sizes="192px" className="max-h-20 max-w-[150px] w-auto h-auto object-contain" />
                 )}
               </li>
             ))}
@@ -215,6 +223,50 @@ export function BandaDeMarcas() {
         ))}
       </div>
     </div>
+  );
+}
+
+// ─── Marcas de un servicio ────────────────────────────────────────────────────
+/**
+ * Grilla de las marcas que contrataron un servicio, para `/servicios/[slug]`.
+ * Es la prueba concreta de cada página: mismas tarjetas que el muro, sin
+ * filtros, sin marquee. Si un servicio no tiene marcas autorizadas, no
+ * devuelve nada y la página no muestra la sección.
+ */
+export function MarcasPorServicio({ slug, titulo }) {
+  const marcas = CLIENTES_PUBLICOS.filter((c) => c.servicios.includes(slug));
+  if (!marcas.length) return null;
+  const activas = marcas.filter((c) => c.estado === 'activo').length;
+
+  return (
+    <Section id="marcas" variant="alt" aria-labelledby="marcas-servicio-heading">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <Reveal className="text-center mb-10">
+          <p className="text-sm font-semibold uppercase tracking-widest text-brand mb-3">Quiénes lo contrataron</p>
+          <h2 id="marcas-servicio-heading" className="text-3xl md:text-5xl font-bold text-ink tracking-tight">
+            {marcas.length === 1 ? 'Una marca' : `${marcas.length} marcas`} con {titulo}
+            {activas > 0 && (
+              <span className="block text-ink-muted text-xl md:text-2xl font-normal mt-3">
+                {activas === marcas.length
+                  ? 'Todas siguen trabajando con nosotros.'
+                  : `${activas} ${activas === 1 ? 'sigue' : 'siguen'} trabajando con nosotros hoy.`}
+              </span>
+            )}
+          </h2>
+        </Reveal>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {marcas.map((c, i) => (
+            <TarjetaMarca key={c.slug} cliente={c} index={i} />
+          ))}
+        </div>
+        <div className="mt-10 text-center">
+          <a href="/casos" className="inline-flex items-center gap-2 text-base font-semibold text-brand hover:text-brand-hover">
+            Ver todas las marcas
+            <span aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>
+    </Section>
   );
 }
 

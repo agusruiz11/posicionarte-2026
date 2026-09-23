@@ -59,7 +59,7 @@ export const CLIENTES = [
     nombre: 'Sello Ambiental COA',
     descripcion: 'Comisión de Sostenibilidad en el Deporte del Comité Olímpico Argentino',
     rubro: 'deporte',
-    servicios: ['diseno-web'],
+    servicios: ['desarrollo', 'diseno-web'],
     tecnologia: 'wordpress',
     estado: 'activo',
     desde: '2025-04',

@@ -26,7 +26,7 @@ import sys
 from playwright.sync_api import sync_playwright
 
 BASE = sys.argv[1] if len(sys.argv) > 1 else 'http://localhost:3000'
-ROUTES = ['/', '/servicios', '/casos', '/contacto', '/inmobiliarias']
+ROUTES = ['/', '/servicios', '/servicios/google-ads', '/servicios/diseno-web', '/servicios/estrategia', '/casos', '/contacto', '/inmobiliarias']
 
 JS_HELPERS = r"""
   function parse(c){const m=c.match(/[\d.]+/g); if(!m) return null;

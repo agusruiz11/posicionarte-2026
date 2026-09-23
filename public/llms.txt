@@ -12,7 +12,7 @@ Trabaja con pymes consolidadas de Argentina en rubros como inmobiliarias, e-comm
 - **Diseño Web** — sitios rápidos, medibles y orientados a conversión (React/Next.js, WordPress, TiendaNube).
 - **Social Media & Content** — presencia consistente con criterio.
 - **Estrategia Digital** — el plan antes que las herramientas.
-- **IA y automatización** — chatbots de WhatsApp que califican leads, agentes que procesan información, automatizaciones entre herramientas.
+- **Desarrollo a medida** — aplicaciones web con usuarios y paneles, integraciones entre sistemas, automatizaciones y agentes con IA (chatbots de WhatsApp que califican leads, agentes que procesan documentos). Stack: React, TypeScript, Next.js, Supabase, Vercel, n8n.
 
 ## Cómo trabaja
 
@@ -23,7 +23,14 @@ Tres modalidades: gestión mensual continua, soluciones puntuales, y consultorí
 ## Páginas
 
 - [Inicio](https://posicionarte.online/): propuesta de valor, servicios, metodología y clientes.
-- [Servicios](https://posicionarte.online/servicios): detalle de los seis servicios.
+- [Servicios](https://posicionarte.online/servicios): detalle de los siete servicios.
+  - [Google Ads](https://posicionarte.online/servicios/google-ads): para quién es, qué incluye, cómo se trabaja, preguntas frecuentes.
+  - [Meta Ads](https://posicionarte.online/servicios/meta-ads)
+  - [SEO / AEO](https://posicionarte.online/servicios/seo-aeo)
+  - [Diseño Web](https://posicionarte.online/servicios/diseno-web)
+  - [Social Media & Content](https://posicionarte.online/servicios/social-content)
+  - [Estrategia Digital](https://posicionarte.online/servicios/estrategia)
+  - [Desarrollo a medida](https://posicionarte.online/servicios/desarrollo)
 - [Casos](https://posicionarte.online/casos): clientes y proyectos, filtrables por servicio.
 - [Inmobiliarias](https://posicionarte.online/inmobiliarias): vertical inmobiliaria y descarga del Benchmark Inmobiliario Argentina 2026.
 - [Contacto](https://posicionarte.online/contacto): formulario y WhatsApp.

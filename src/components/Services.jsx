@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Search, Target, Globe, Palette, MessageSquare, Lightbulb } from 'lucide-react';
+import Link from 'next/link';
+import { Plus, Search, Target, Globe, Palette, MessageSquare, Lightbulb, ArrowRight, Code2 } from 'lucide-react';
 import { EVENTS, track } from '@/lib/analytics';
 import Section from '@/components/Section';
 import Reveal from '@/components/Reveal';
@@ -11,36 +12,49 @@ const services = [
   {
     icon: Target,
     title: 'Google Ads',
+    slug: 'google-ads',
     description:
       'Campañas optimizadas para atraer clientes que buscan activamente tus productos o servicios.',
   },
   {
     icon: MessageSquare,
     title: 'Meta Ads',
+    slug: 'meta-ads',
     description:
       'Publicidad estratégica en Facebook e Instagram para conectar con tu audiencia ideal.',
   },
   {
     icon: Search,
     title: 'SEO / AEO',
+    slug: 'seo-aeo',
     description:
       'Posicionamiento orgánico y optimización para asistentes de voz. Visibilidad a largo plazo.',
   },
   {
     icon: Globe,
     title: 'Diseño Web',
+    slug: 'diseno-web',
     description:
       'Sitios web profesionales, funcionales y orientados a la conversión (WordPress, TiendaNube, React).',
   },
   {
     icon: Palette,
     title: 'Social Media & Content',
+    slug: 'social-content',
     description:
       'Gestión de redes, creación de contenido y diseño de piezas gráficas que conectan.',
   },
   {
+    icon: Code2,
+    title: 'Desarrollo a medida',
+    slug: 'desarrollo',
+    description:
+      'Aplicaciones web, integraciones entre sistemas, automatizaciones y agentes con IA. Código propio, a tu nombre, para lo que ninguna herramienta de estante resuelve.',
+  },
+  {
     icon: Lightbulb,
     title: 'Estrategia Digital',
+    slug: 'estrategia',
     description:
       'Consultoría, análisis de mercado, y plan de acción integral para tu negocio.',
   },
@@ -131,6 +145,14 @@ const Services = () => {
                         <p className="text-lg text-ink-muted max-w-2xl leading-relaxed">
                           {service.description}
                         </p>
+                        <Link
+                          href={`/servicios/${service.slug}`}
+                          className="mt-5 inline-flex items-center gap-2 text-base font-semibold text-brand hover:text-brand-hover"
+                          onClick={() => track(EVENTS.CTA_CLICK, { cta_text: 'Ver el servicio', cta_location: `servicios-${service.slug}` })}
+                        >
+                          Ver el servicio completo
+                          <ArrowRight size={16} aria-hidden="true" />
+                        </Link>
                       </div>
                     </motion.div>
                   )}

@@ -64,7 +64,7 @@ const modalidades = [
     subtitle: 'Un trabajo con principio y fin.',
     description:
       'Para cuando necesitás resolver una cosa concreta y no un acompañamiento.',
-    features: ['Sitio web o landing', 'Auditoría digital', 'Consultoría 1:1'],
+    features: ['Sitio web o landing', 'Desarrollo a medida', 'Auditoría digital', 'Consultoría 1:1'],
     compromiso: 'Sin permanencia',
     highlight: false,
   },

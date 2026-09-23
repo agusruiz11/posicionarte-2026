@@ -121,11 +121,15 @@ export default function LeadForm({
   textoExito = 'Gracias. Te respondemos dentro de las próximas 24 horas hábiles.',
   tituloExito = 'Mensaje enviado',
   className = '',
+  // Valores con los que arranca el formulario. Las páginas de servicio lo usan
+  // para dejar "Qué te interesa" ya elegido: el campo sigue en el bloque
+  // extra, pero el dato viaja igual aunque el visitante no lo despliegue.
+  valoresIniciales = {},
 }) {
   const config = FORMULARIOS[formId];
   if (!config) throw new Error(`LeadForm: no existe el formulario "${formId}"`);
 
-  const [datos, setDatos] = useState({});
+  const [datos, setDatos] = useState(valoresIniciales);
   const [consent, setConsent] = useState(false);
   const [novedades, setNovedades] = useState(false);
   const [estado, setEstado] = useState('idle'); // idle | enviando | listo

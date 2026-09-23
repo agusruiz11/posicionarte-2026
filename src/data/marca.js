@@ -46,7 +46,7 @@ export const UBICACION = {
   pais: 'AR',
   paisNombre: 'Argentina',
   zona: 'Caballito, CABA',
-  visible: 'Caballito, CABA — Argentina',
+  visible: 'Caballito, CABA, Argentina',
   remoto: true,
 };
 
@@ -75,12 +75,14 @@ export const SERVICIOS = [
   { slug: 'diseno-web', nombre: 'Diseño Web', resumen: 'Sitios rápidos, medibles y orientados a conversión.' },
   { slug: 'social-content', nombre: 'Social Media & Content', resumen: 'Presencia consistente con criterio.' },
   { slug: 'estrategia', nombre: 'Estrategia Digital', resumen: 'El plan antes que las herramientas.' },
+  { slug: 'desarrollo', nombre: 'Desarrollo a medida', resumen: 'Software, integraciones, automatizaciones e IA.' },
 ];
 
 /** Rutas públicas. Alimenta el sitemap y el llms.txt. */
 export const RUTAS = [
   { path: '/', prioridad: 1.0, frecuencia: 'monthly' },
   { path: '/servicios', prioridad: 0.9, frecuencia: 'monthly' },
+  ...SERVICIOS.map((s) => ({ path: `/servicios/${s.slug}`, prioridad: 0.8, frecuencia: 'monthly' })),
   { path: '/casos', prioridad: 0.8, frecuencia: 'monthly' },
   { path: '/inmobiliarias', prioridad: 0.9, frecuencia: 'monthly' },
   { path: '/contacto', prioridad: 0.7, frecuencia: 'yearly' },
