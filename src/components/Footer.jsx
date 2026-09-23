@@ -11,6 +11,7 @@ import { BENCHMARK } from '@/data/benchmark';
 import logoOnline from '@/assets/logo/logo-online.png';
 import Section from '@/components/Section';
 import Reveal from '@/components/Reveal';
+import Partners from '@/components/Partners';
 
 const Footer = ({ hideForm = false }) => {
   const year = new Date().getFullYear();
@@ -107,6 +108,8 @@ const Footer = ({ hideForm = false }) => {
             </ul>
           </nav>
         </div>
+
+        <Partners className="border-t border-hairline pt-10 mt-12" />
 
         <div className="border-t border-hairline pt-8 mt-12">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
