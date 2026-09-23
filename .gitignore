@@ -12,3 +12,6 @@ src/assets/videos/*.mov
 # Build de export estático de la etapa Hostinger. Ya no se genera:
 # el deploy es Vercel desde GitHub.
 out/
+
+
+Claude outputs/
